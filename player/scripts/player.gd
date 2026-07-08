@@ -19,6 +19,8 @@ const defult_move_speed: float = 200.0
 # 移速倍率表
 var move_speed_modifiers: Array[float] = [DEFAULT_MOVE_SPEED_MULTIPLIER]
 
+# 可跳跃
+var CAN_JUMP:bool = false
 # 默认跳跃高度
 const defult_jump_height: float = 100.0
 # 默认跳高倍率
@@ -50,12 +52,24 @@ var direction: Vector2 = Vector2.ZERO
 func  _ready() -> void:
 	# 初始化 states
 	initialize_states()
+	CAN_JUMP = true
 	pass
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	change_state(current_state.handle_input(event))
+	#region /// 一次性输入
+	# 跳跃
+	if event.is_action("jump"):
+		if is_on_floor() or coyote_timer > 0.0 or remaining_jumps >0 or CAN_JUMP:
+			change_state(get_node("States/Jump"))
+			return
+	## 其他一次性动作
+	# if event.is_action("示例状态机")
+		# if 状态机可用条件
+		# pass
+	change_state(current_state.handle_input(event)) # 如果所有输入都在这里统一处理，状态中的 handle_input 可以简化或移除。
 	pass
+	#endregion
 	
 	
 func _process(_delta: float) -> void:
@@ -66,14 +80,11 @@ func _process(_delta: float) -> void:
 
 func _physics_process(_delta: float) -> void:
 	# 全局计时维护
-	var coyote_timer_is_tick_tock:bool = false
 	if is_on_floor():
 		coyote_timer = coyote_time
 		remaining_jumps = max_extra_jumps
-	elif not is_jumping:
+	else:
 		coyote_timer =max(0.0, coyote_timer - _delta)
-		coyote_timer_is_tick_tock = true
-		
 		
 	# 重力
 	velocity.y += gravity * _delta
