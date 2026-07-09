@@ -33,7 +33,8 @@ var jump_height_modifiers: Array[float] = [DEFAULT_JUMP_HEIGHT_MULTIPLIER]
 var is_jumping: bool = false
 # 土狗时间
 var coyote_timer: float = 0.0
-@export var coyote_time: float = 0.01
+@export var coyote_time: float = 0.27
+
 # 多段跳
 @export var max_extra_jumps: int = 1
 var remaining_jumps: int = 0
@@ -45,6 +46,8 @@ var gravity: float = GRAVITATIONAL_ACCELERATION * NORMAL_GRAVITY_RATE
 
 # 运动向量
 var direction: Vector2 = Vector2.ZERO
+# 认不出这个可以重开了
+var current_delta: float = 0.0
 
 #endregion
 
@@ -52,6 +55,8 @@ var direction: Vector2 = Vector2.ZERO
 func  _ready() -> void:
 	# 初始化 states
 	initialize_states()
+	coyote_timer = coyote_time
+	print(coyote_timer)
 	CAN_JUMP = true
 	pass
 
@@ -60,7 +65,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	#region /// 一次性输入
 	# 跳跃
 	if event.is_action("jump"):
-		if is_on_floor() or coyote_timer > 0.0 or CAN_JUMP:
+		if _can_jump():
 			change_state(get_node("States/Jump"))
 			return
 	## 其他一次性动作
@@ -80,11 +85,15 @@ func _process(_delta: float) -> void:
 
 func _physics_process(_delta: float) -> void:
 	# 全局计时维护
-	if is_on_floor():
-		coyote_timer = coyote_time
-		remaining_jumps = max_extra_jumps
+	if not is_on_floor() and not is_jumping:
+		coyote_timer = max(0.0, coyote_timer - _delta)
+		#if coyote_timer > 0:
+			#print("coyote timer is now tick tock")
+		#else:
+			#print("coyote timer is done")
 	else:
-		coyote_timer =max(0.0, coyote_timer - _delta)
+		coyote_timer = coyote_time
+		#print("coyote timer reset: ", coyote_time)
 		
 	# 重力
 	velocity.y += gravity * _delta
@@ -170,3 +179,11 @@ func _get_total_jump_height_multiplier() -> float:
 func _get_effective_jump_height() -> float:
 	return defult_jump_height * _get_total_jump_height_multiplier()
 	
+# 可跳跃判断
+func _can_jump() -> bool:
+	if is_on_floor() or coyote_timer > 0:
+		return true
+	else:
+		return false
+			
+			

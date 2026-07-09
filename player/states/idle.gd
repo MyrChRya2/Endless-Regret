@@ -8,7 +8,6 @@ func  init() -> void:
 # 进入 state 时会发生什么？
 func enter() -> void:
 	print("enter ", name)
-	player.velocity.x = 0
 	pass
 	
 	
