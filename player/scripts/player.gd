@@ -33,7 +33,7 @@ var jump_height_modifiers: Array[float] = [DEFAULT_JUMP_HEIGHT_MULTIPLIER]
 var is_jumping: bool = false
 # 土狗时间
 var coyote_timer: float = 0.0
-@export var coyote_time: float = 0.1
+@export var coyote_time: float = 0.01
 # 多段跳
 @export var max_extra_jumps: int = 1
 var remaining_jumps: int = 0
@@ -60,7 +60,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	#region /// 一次性输入
 	# 跳跃
 	if event.is_action("jump"):
-		if is_on_floor() or coyote_timer > 0.0 or remaining_jumps >0 or CAN_JUMP:
+		if is_on_floor() or coyote_timer > 0.0 or CAN_JUMP:
 			change_state(get_node("States/Jump"))
 			return
 	## 其他一次性动作

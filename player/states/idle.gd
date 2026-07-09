@@ -29,4 +29,8 @@ func process(_delta: float) -> PlayerState:
 	
 # 在 state 中 每个 phusics process tick 会发生什么？
 func physics_process(_delta: float) -> PlayerState:
+	if Input.get_axis("move_left", "move_right") != 0.0:
+		return get_node("../Run")
+	if Input.is_action_just_pressed("jump"):
+		return get_node("../Jump")
 	return null

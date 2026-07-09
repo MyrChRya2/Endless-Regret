@@ -65,6 +65,7 @@ func physics_process(_delta: float) -> PlayerState:
 		player.coyote_timer = player.coyote_time
 		player.is_jumping = false
 		return get_node("../Idle")
+
 		
 	var move_input := Input.get_axis("move_left", "move_right")
 	player.velocity.x = move_input * player._get_effective_move_speed()

@@ -31,6 +31,7 @@ func process(_delta: float) -> PlayerState:
 func physics_process(_delta: float) -> PlayerState:
 	var move_input := Input.get_axis("move_left", "move_right")
 	player.velocity.x = move_input * player._get_effective_move_speed()
-	
+	if move_input == 0.0:
+		return get_node("../Idle")
 	
 	return null
