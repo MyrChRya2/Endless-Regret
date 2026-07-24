@@ -23,7 +23,6 @@ func  init() -> void:
 # 进入 state 时会发生什么？
 func enter() -> void:
 	print("enter ", name)
-	player.is_jumping = true
 	if player.is_on_floor():
 		is_grounded_jump = true
 		print("grounded jump: ", is_grounded_jump)
@@ -42,22 +41,20 @@ func exit() -> void:
 	
 # 按下 input 时会发生什么？
 func handle_input(_event:InputEvent) -> PlayerState:
-	return next_state
+	return null
 	
 	
 # 在 state 中 每个 process tick 会发生什么？
 func process(_delta: float) -> PlayerState:
-	return next_state
+	return null
 	
 # 在 state 中 每个 phusics process tick 会发生什么？
 func physics_process(_delta: float) -> PlayerState:
+	# 空中水平移动
+	var move_direction = Input.get_axis("move_left", "move_right")
+	player.velocity.x = move_direction * player._get_effective_move_speed() * player.air_move_speed
 	# 落地检测
-	if player.is_on_floor():
-		player.is_jumping = false
+	if player.velocity.y >= 0 and player.is_on_floor():
 		return get_node("../Idle")
-
-		
-	var move_input := Input.get_axis("move_left", "move_right")
-	player.velocity.x = move_input * player._get_effective_move_speed()
 	
 	return null
