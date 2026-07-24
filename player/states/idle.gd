@@ -31,6 +31,6 @@ func process(_delta: float) -> PlayerState:
 func physics_process(_delta: float) -> PlayerState:
 	if Input.is_action_just_pressed("jump"):
 		return get_node("../Jump")
-	if Input.is_action_just_pressed("move_left") or Input.is_action_just_pressed("move_right"):
+	if Input.get_axis("move_left", "move_right") != 0:
 		return get_node("../Run")
 	return null

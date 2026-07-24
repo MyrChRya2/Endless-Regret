@@ -41,7 +41,15 @@ var gravity: float = GRAVITATIONAL_ACCELERATION * NORMAL_GRAVITY_RATE
 #endregion
 
 #region /// friction
+# 默认摩擦系数
+const default_cof: float = 1.0
+# 摩擦倍率
 @export var DEFAULT_FRICTION_MULTIPLIER: float = 1.0
+# 摩擦倍率表
+var cof_modifiers: Array[float] = [DEFAULT_FRICTION_MULTIPLIER]
+
+# 地面材质倍率
+var ground_friction_multiplier: float = 1.0
 #endregion
 
 #endregion
@@ -76,6 +84,7 @@ func _physics_process(_delta: float) -> void:
 	if current_state:
 		var next_state = current_state.physics_process(_delta)
 		move_and_slide()
+		update_ground_friction_from_tile()
 		if next_state != null:
 			change_state(next_state)
 			
@@ -123,4 +132,39 @@ func _get_total_jump_height_multiplier() -> float:
 # 最终跳跃高度
 func _get_effective_jump_height() -> float:
 	return default_jump_height * _get_total_jump_height_multiplier()
+	
+
+# 当前摩擦倍率
+func _get_total_cof_multiplier() -> float:
+	var total_cof := 1.0
+	for cof_modifier in cof_modifiers:
+		total_cof *= cof_modifier
+	return total_cof
+# 最终摩擦系数
+func _get_effective_cof() -> float:
+	return default_cof * _get_total_cof_multiplier() * ground_friction_multiplier
+	
+func update_ground_friction_from_tile() -> void:
+	var last_collision = get_last_slide_collision()
+	var multiplier = 1.0
+	
+	if last_collision != null:
+		var collider = last_collision.get_collider()
+		
+		if collider is TileMapLayer:
+			var tilemap: TileMapLayer = collider
+			var local_pos = tilemap.to_local(last_collision.get_position())
+			var coords = tilemap.local_to_map(local_pos)
+			var tile_data = tilemap.get_cell_tile_data(coords)
+			
+			if tile_data and  tile_data.has_custom_data("friction"):
+				multiplier = tile_data.get_custom_data("friction")
+				
+	ground_friction_multiplier = multiplier
+
+
+
+
+
+
 	

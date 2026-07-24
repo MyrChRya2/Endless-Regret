@@ -23,11 +23,7 @@ func  init() -> void:
 # 进入 state 时会发生什么？
 func enter() -> void:
 	print("enter ", name)
-	if player.is_on_floor():
-		is_grounded_jump = true
-		print("grounded jump: ", is_grounded_jump)
-	else:
-		is_grounded_jump = false
+	is_grounded_jump = player.is_on_floor()
 	var jump_velocity := sqrt(2 * player.gravity * player._get_effective_jump_height())
 	player.velocity.y = -jump_velocity
 	
@@ -52,7 +48,8 @@ func process(_delta: float) -> PlayerState:
 func physics_process(_delta: float) -> PlayerState:
 	# 空中水平移动
 	var move_direction = Input.get_axis("move_left", "move_right")
-	player.velocity.x = move_direction * player._get_effective_move_speed() * player.air_move_speed
+	if move_direction != 0:
+		player.velocity.x = move_direction * player._get_effective_move_speed() * player.air_move_speed
 	# 落地检测
 	if player.velocity.y >= 0 and player.is_on_floor():
 		return get_node("../Idle")

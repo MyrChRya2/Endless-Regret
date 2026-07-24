@@ -2,24 +2,22 @@
 
 [ext_resource type="Script" uid="uid://lrdiubkykuql" path="res://player/scripts/player.gd" id="1_oul6g"]
 [ext_resource type="Script" uid="uid://b2b4mqfliv2vc" path="res://player/states/idle.gd" id="2_g1dw6"]
+[ext_resource type="Texture2D" uid="uid://gf205scokiyt" path="res://assets/game/character/basic_charector_icon.png" id="2_qjkh3"]
 [ext_resource type="Script" uid="uid://oqpd00rfqmu5" path="res://player/states/run.gd" id="3_yw30f"]
 [ext_resource type="Script" uid="uid://b33wfn4p4bi58" path="res://player/states/jump.gd" id="4_yw30f"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_kqu6x"]
-size = Vector2(18, 48)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oul6g"]
-size = Vector2(16, 46)
+size = Vector2(16, 27)
 
 [node name="Player" type="CharacterBody2D" unique_id=848087259]
 script = ExtResource("1_oul6g")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=461260218]
-position = Vector2(0, -24)
-texture = SubResource("PlaceholderTexture2D_kqu6x")
+position = Vector2(0, -15)
+texture = ExtResource("2_qjkh3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666999116]
-position = Vector2(0, -23)
+position = Vector2(0, -13.5)
 shape = SubResource("RectangleShape2D_oul6g")
 
 [node name="States" type="Node" parent="." unique_id=1340329346]
