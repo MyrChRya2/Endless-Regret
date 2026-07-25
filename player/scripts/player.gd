@@ -24,14 +24,35 @@ var move_speed_modifiers: Array[float] = [DEFAULT_MOVE_SPEED_MULTIPLIER]
 # 默认跳跃高度
 const default_jump_height: float = 100.0
 # 默认跳高倍率
-@export var DEFAULT_JUMP_HEIGHT_MULTIPLIER: float = 1.0
+@export var DEFAULT_JUMP_HEIGHT_MULTIPLIER: float = 0.7
 # 跳高倍率表
 var jump_height_modifiers: Array[float] = [DEFAULT_JUMP_HEIGHT_MULTIPLIER]
 # 跳跃截取系数 
 @export var jump_cut_multiplier: float = 0.6
+#endregion
 
+#region /// air movement
 # 空中移动移速倍率
-const air_move_speed: float = 0.8
+const air_move_speed: float = 0.6
+# 空中加速灵敏度
+@export var air_acceleration: float = 800.0
+# 空中速度衰减灵敏度
+@export var air_deceleration: float = 400.0
+
+# 多端跳次数
+var extra_air_jumps: int = 1
+# 剩余多端跳次数多段跳
+var remaining_air_jumps = extra_air_jumps
+
+# 跳跃预输入窗口
+@export var jump_buffer_time: float = 0.15
+# 跳跃与输入窗口剩余时间
+var jump_buffer_timer: float = 0.0
+
+# 土狼跳
+var can_coyote_jump: bool = true
+# 平面边缘掉落检测
+var is_falling_off_ledge: bool = false
 #endregion
 
 #region /// gravity
@@ -79,8 +100,14 @@ func _process(_delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 	# 重力
 	velocity.y += gravity * _delta
+	# 更新多端跳次数
+	if is_on_floor():
+		reset_remaining_air_jump()
 	# 更新土狗时间
-	#update_coyote_timer(_delta)
+	if is_on_floor():
+		can_coyote_jump = true
+	else:
+		pass
 	if current_state:
 		var next_state = current_state.physics_process(_delta)
 		move_and_slide()
@@ -103,8 +130,19 @@ func initialize_states() -> void:
 	
 	
 func change_state(new_state:PlayerState) -> void:
-	if new_state == null or new_state == current_state:
+	if new_state == null:
+		print("⚠️ change_state 收到 null，忽略")
 		return
+	if new_state == current_state:
+		print("ℹ️ 尝试切换到当前状态 [", current_state.name, "]，已忽略")
+		return
+		
+	var from_name = "NULL"
+	if current_state:
+		from_name = current_state.name
+	var to_name = new_state.name
+	print("🔄 [状态机] ", from_name, " -> ", to_name)
+	
 	if current_state:
 		current_state.exit()
 		
@@ -161,6 +199,11 @@ func update_ground_friction_from_tile() -> void:
 				multiplier = tile_data.get_custom_data("friction")
 				
 	ground_friction_multiplier = multiplier
+	
+func reset_remaining_air_jump() -> int:
+	remaining_air_jumps = extra_air_jumps	
+	return remaining_air_jumps
+	
 
 
 

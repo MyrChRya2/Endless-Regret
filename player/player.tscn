@@ -5,6 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://gf205scokiyt" path="res://assets/game/character/basic_charector_icon.png" id="2_qjkh3"]
 [ext_resource type="Script" uid="uid://oqpd00rfqmu5" path="res://player/states/run.gd" id="3_yw30f"]
 [ext_resource type="Script" uid="uid://b33wfn4p4bi58" path="res://player/states/jump.gd" id="4_yw30f"]
+[ext_resource type="Script" uid="uid://808xgksr0b3b" path="res://player/states/slide.gd" id="6_g6k8r"]
+[ext_resource type="Script" uid="uid://cn6uwame54mm6" path="res://player/states/fall.gd" id="7_boad6"]
+[ext_resource type="Script" uid="uid://c4vs8en7ce5o0" path="res://player/states/fatigue_jump.gd" id="8_rgyib"]
+[ext_resource type="Script" uid="uid://c7d0cammwo0jg" path="res://player/air_jump.gd" id="9_hg6s5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oul6g"]
 size = Vector2(16, 27)
@@ -30,3 +34,15 @@ script = ExtResource("3_yw30f")
 
 [node name="Jump" type="Node" parent="States" unique_id=511759234]
 script = ExtResource("4_yw30f")
+
+[node name="FatigueJump" type="Node" parent="States" unique_id=1883392336]
+script = ExtResource("8_rgyib")
+
+[node name="Slide" type="Node" parent="States" unique_id=1253574523]
+script = ExtResource("6_g6k8r")
+
+[node name="Fall" type="Node" parent="States" unique_id=466397068]
+script = ExtResource("7_boad6")
+
+[node name="AirJump" type="Node" parent="States" unique_id=1372473486]
+script = ExtResource("9_hg6s5")
