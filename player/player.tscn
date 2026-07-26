@@ -46,3 +46,6 @@ script = ExtResource("7_boad6")
 
 [node name="AirJump" type="Node" parent="States" unique_id=1372473486]
 script = ExtResource("9_hg6s5")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1147996516]
+zoom = Vector2(1.5, 1.5)

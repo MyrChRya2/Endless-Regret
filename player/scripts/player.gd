@@ -13,7 +13,7 @@ var current_state: PlayerState = null
 
 #region /// run
 # 默认奔跑速度
-const default_run_speed: float = 300.0
+const default_run_speed: float = 200.0
 # 默认奔跑倍率
 @export var DEFAULT_MOVE_SPEED_MULTIPLIER: float = 1.0
 # 移速倍率表
