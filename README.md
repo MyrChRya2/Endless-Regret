@@ -1,3 +1,3 @@
 # galaxy
 
-idk
+https://myrchrya2.itch.io/endlessregret
