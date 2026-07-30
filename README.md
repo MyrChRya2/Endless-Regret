@@ -1,3 +1,5 @@
 # galaxy
 
-https://myrchrya2.itch.io/endlessregret
+Still in alpha testing
+
+Should I put the game over there?
