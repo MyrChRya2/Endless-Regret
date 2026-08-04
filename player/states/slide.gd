@@ -15,6 +15,10 @@ func process(_delta: float) -> PlayerState:
 	
 	
 func physics_process(_delta: float) -> PlayerState:
+	var parent_result = super.physics_process(_delta)
+	if parent_result != null:
+		return parent_result
+		
 	if Input.get_axis("move_left", "move_right"):
 		return player.get_state("Run")
 		
@@ -23,7 +27,7 @@ func physics_process(_delta: float) -> PlayerState:
 		var effective_friction = player._get_effective_cof() * base_friction
 		player.velocity.x = move_toward(player.velocity.x, 0.0, effective_friction * _delta)
 	else:
-		return player.get_state("Fall")
+		return player.get_state("Airborne")
 		
 	if abs(player.velocity.x) < 1.0:
 		player.velocity.x =0

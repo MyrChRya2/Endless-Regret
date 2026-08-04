@@ -1,23 +1,21 @@
 [gd_scene format=3 uid="uid://b2umh86lg20o8"]
 
 [ext_resource type="Script" uid="uid://lrdiubkykuql" path="res://player/scripts/player.gd" id="1_oul6g"]
+[ext_resource type="Texture2D" uid="uid://dgvfl15bpogc1" path="res://assets/game/character/player_airborne.png" id="2_boad6"]
 [ext_resource type="Script" uid="uid://b2b4mqfliv2vc" path="res://player/states/idle.gd" id="2_g1dw6"]
 [ext_resource type="Script" uid="uid://oqpd00rfqmu5" path="res://player/states/run.gd" id="3_yw30f"]
-[ext_resource type="Script" uid="uid://b33wfn4p4bi58" path="res://player/states/jump.gd" id="4_yw30f"]
 [ext_resource type="Script" uid="uid://808xgksr0b3b" path="res://player/states/slide.gd" id="6_g6k8r"]
-[ext_resource type="Script" uid="uid://cn6uwame54mm6" path="res://player/states/fall.gd" id="7_boad6"]
-[ext_resource type="Script" uid="uid://c4vs8en7ce5o0" path="res://player/states/fatigue_jump.gd" id="8_rgyib"]
+[ext_resource type="Script" uid="uid://bomcvf3io767f" path="res://player/states/airborne.gd" id="8_rgyib"]
 [ext_resource type="Texture2D" uid="uid://88u4xpxjow2q" path="res://assets/game/character/Player_idle.png" id="9_2ieo8"]
 [ext_resource type="Texture2D" uid="uid://dnshoyp7fv6k6" path="res://assets/game/character/Player_move.png" id="9_8t03j"]
-[ext_resource type="Script" uid="uid://c7d0cammwo0jg" path="res://player/states/air_jump.gd" id="9_hg6s5"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_pnw6m"]
-atlas = ExtResource("9_8t03j")
-region = Rect2(32, 64, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_rgyib"]
+atlas = ExtResource("2_boad6")
+region = Rect2(0, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_1so5t"]
-atlas = ExtResource("9_8t03j")
-region = Rect2(0, 64, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_hg6s5"]
+atlas = ExtResource("2_boad6")
+region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ebec5"]
 atlas = ExtResource("9_2ieo8")
@@ -50,14 +48,6 @@ region = Rect2(32, 0, 16, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_c35mf"]
 atlas = ExtResource("9_2ieo8")
 region = Rect2(48, 0, 16, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_55jnj"]
-atlas = ExtResource("9_8t03j")
-region = Rect2(96, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_dx5ib"]
-atlas = ExtResource("9_8t03j")
-region = Rect2(64, 64, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_65viv"]
 atlas = ExtResource("9_8t03j")
@@ -139,18 +129,13 @@ region = Rect2(288, 0, 32, 32)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_pnw6m")
-}],
-"loop": true,
-"name": &"fall_left",
-"speed": 5.0
+"texture": SubResource("AtlasTexture_rgyib")
 }, {
-"frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_1so5t")
+"texture": SubResource("AtlasTexture_hg6s5")
 }],
-"loop": true,
-"name": &"fall_right",
+"loop": false,
+"name": &"airborne",
 "speed": 5.0
 }, {
 "frames": [{
@@ -185,22 +170,6 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle_right",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_55jnj")
-}],
-"loop": true,
-"name": &"jump_left",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_dx5ib")
-}],
-"loop": true,
-"name": &"jump_right",
 "speed": 5.0
 }, {
 "frames": [{
@@ -291,7 +260,7 @@ script = ExtResource("1_oul6g")
 unique_name_in_owner = true
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_wodsf")
-animation = &"fall_left"
+animation = &"airborne"
 autoplay = "idle_right"
 
 [node name="States" type="Node" parent="." unique_id=1340329346]
@@ -302,20 +271,11 @@ script = ExtResource("2_g1dw6")
 [node name="Run" type="Node" parent="States" unique_id=1547033367]
 script = ExtResource("3_yw30f")
 
-[node name="Jump" type="Node" parent="States" unique_id=511759234]
-script = ExtResource("4_yw30f")
-
-[node name="FatigueJump" type="Node" parent="States" unique_id=1883392336]
-script = ExtResource("8_rgyib")
-
 [node name="Slide" type="Node" parent="States" unique_id=1253574523]
 script = ExtResource("6_g6k8r")
 
-[node name="Fall" type="Node" parent="States" unique_id=466397068]
-script = ExtResource("7_boad6")
-
-[node name="AirJump" type="Node" parent="States" unique_id=1372473486]
-script = ExtResource("9_hg6s5")
+[node name="Airborne" type="Node" parent="States" unique_id=604632069]
+script = ExtResource("8_rgyib")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666999116]
 position = Vector2(0, -13.5)

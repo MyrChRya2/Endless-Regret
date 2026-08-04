@@ -5,11 +5,11 @@ class_name GroundState extends PlayerState
 func physics_process(_delta: float) -> PlayerState:
 	# 通用跳跃检测
 	if Input.is_action_just_pressed("jump"):
-		return player.get_state("Jump")
+		return player.get_state("Airborne")
 		
 	# 通用边缘掉落检测
 	if not player.is_on_floor() and  player.velocity.y >= 0:
 		player.is_falling_off_ledge = true
-		return player.get_state("Fall")
+		return player.get_state("Airborne")
 		
 	return null

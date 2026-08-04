@@ -86,6 +86,8 @@ var last_facing: FacingDir
 
 #endregion
 
+var MAX_JUMP_VEL: float
+
 
 func  _ready() -> void:
 	# 初始化 states
@@ -118,21 +120,18 @@ func _process(_delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 	# 重力
 	velocity.y += gravity * _delta
-	# 更新多端跳次数
+	move_and_slide()
+	update_ground_friction_from_tile()
+	
 	if is_on_floor():
+		velocity.y = 0
 		reset_remaining_air_jump()
-	# 更新土狗时间
-	if is_on_floor():
 		can_coyote_jump = true
-	else:
-		pass
+		
 	if current_state:
 		var next_state = current_state.physics_process(_delta)
-		move_and_slide()
-		update_ground_friction_from_tile()
 		if next_state != null:
 			change_state(next_state)
-			
 
 	
 func initialize_states() -> void:
@@ -238,7 +237,41 @@ func play_anim(anim_base: String) -> void:
 	if player_anim.animation != anim_name:
 		player_anim.play(anim_name)
 
+# 物理驱动空中动画
+func update_air_animation() -> void:
+	var frame_count = player_anim.sprite_frames.get_frame_count("airborne")
+	if frame_count <= 0:
+		return
+		
+	if player_anim.animation != "airborne":
+		player_anim.play("airborne")
 	
+	# 理论最大上升速度
+	var max_vel = sqrt(2.0 * gravity * _get_effective_jump_height())
+	# 防止除以0
+	if max_vel <= 0.0:
+		player_anim.frame = 0
+		return
+		
+	# 将垂直速度映射到 [0, 1] 区间 -> [-max_vel, +max_vel]
+	var t = clamp((velocity.y + max_vel) / (2.0 * max_vel), 0.0, 1.0)
+	
+	# 四舍五入到帧索引
+	var index = int(round(t * (frame_count - 1)))
+	player_anim.frame = index
+
+	
+# 空中水平移动
+func air_move(_delta: float) -> void:
+	var move_direction = Input.get_axis("move_left", "move_right")
+	var target_speed = move_direction * _get_effective_move_speed() * air_move_speed
+	if move_direction != 0:
+		velocity.x = move_toward(velocity.x, target_speed, air_acceleration * _delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, air_deceleration * _delta)
+		
+		
+	# 调试HUD数据抓取
 func _push_debug_data() -> void:
 	if not DebugManager:
 		return
