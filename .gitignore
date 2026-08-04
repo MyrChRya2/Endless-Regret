@@ -17,3 +17,6 @@ mono_crash.*.json
 
 # Dev-tools ignores
 dev_tools/
+
+# Demo
+Demo/
