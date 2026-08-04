@@ -11,6 +11,12 @@ func enter() -> void:
 	player.velocity.y = -jump_velocity
 	
 	
+func process(_delta: float) -> PlayerState:
+	player.play_anim("jump")
+	
+	return null
+	
+	
 # 在 state 中 每个 phusics process tick 会发生什么？
 func physics_process(_delta: float) -> PlayerState:
 	# 跳跃截断

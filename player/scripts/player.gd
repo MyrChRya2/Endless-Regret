@@ -76,9 +76,21 @@ var ground_friction_multiplier: float = 1.0
 #endregion
 
 
+#region /// Animation
+
+enum FacingDir { LEFT, RIGHT }
+var facing: FacingDir
+var last_facing: FacingDir
+
+@onready var player_anim: AnimatedSprite2D = %PlayerAnim
+
+#endregion
+
+
 func  _ready() -> void:
 	# 初始化 states
 	initialize_states()
+	initialize_facing()
 	pass
 
 
@@ -94,6 +106,12 @@ func _process(_delta: float) -> void:
 		var next_state = current_state.process(_delta)
 		if next_state != null:
 			change_state(next_state)
+	
+	if velocity.x != 0:
+		facing = FacingDir.RIGHT if velocity.x > 0 else FacingDir.LEFT
+		last_facing = facing
+		
+	_push_debug_data()
 	pass
 
 
@@ -141,13 +159,17 @@ func change_state(new_state:PlayerState) -> void:
 	if current_state:
 		from_name = current_state.name
 	var to_name = new_state.name
-	print("🔄 [状态机] ", from_name, " -> ", to_name)
+	DebugManager.log_state_change(from_name, to_name)
 	
 	if current_state:
 		current_state.exit()
 		
 	current_state = new_state
 	current_state.enter()
+	
+	
+func get_state(_name: String) -> PlayerState:
+	return states_machine_container.get_node(_name)
 	
 	
 # 当前移动倍率
@@ -205,9 +227,24 @@ func reset_remaining_air_jump() -> int:
 	return remaining_air_jumps
 	
 
+func initialize_facing() -> void:
+	facing = FacingDir.RIGHT
+	last_facing = facing
 
 
-
-
+func play_anim(anim_base: String) -> void:
+	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
+	var anim_name = anim_base + suffix
+	if player_anim.animation != anim_name:
+		player_anim.play(anim_name)
 
 	
+func _push_debug_data() -> void:
+	if not DebugManager:
+		return
+		
+	DebugManager.set_value("player_pos", global_position)
+	DebugManager.set_value("player_vel", velocity.length())
+	DebugManager.set_value("player_vel_x", velocity.x)
+	DebugManager.set_value("player_vel_y", velocity.y)
+	DebugManager.set_value("is_on_floor", is_on_floor())

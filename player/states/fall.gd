@@ -8,6 +8,12 @@ func enter() -> void:
 		player.can_coyote_jump = false
 		
 		
+func process(_delta: float) -> PlayerState:
+	player.play_anim("fall")
+	
+	return null
+	
+	
 func  physics_process(_delta: float) -> PlayerState:
 	# 空中水平物理
 	var move_direction = Input.get_axis("move_left", "move_right")

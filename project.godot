@@ -15,6 +15,10 @@ run/main_scene="res://playground.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+DebugManager="*uid://5v0475xw3utr"
+
 [display]
 
 window/size/viewport_width=640

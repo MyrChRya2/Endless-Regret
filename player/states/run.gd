@@ -1,28 +1,24 @@
-class_name PlayerStateRun extends PlayerState
+class_name PlayerStateRun extends GroundState
 
-@export var acceleration: float = 2400.0
+@export var accel: float = 2400.0
 
+
+func process(_delta: float) -> PlayerState:
+	player.play_anim("run")
+	return null
 	
 # 在 state 中 每个 phusics process tick 会发生什么？
 func physics_process(_delta: float) -> PlayerState:
-	var move_direction = Input.get_axis("move_left", "move_right")
-	var target_speed = player._get_effective_move_speed() * move_direction
+	var parent_result = super.physics_process(_delta)
+	if parent_result != null:
+		return parent_result
 	
-	if move_direction !=0:
-		player.velocity.x = move_toward(player.velocity.x, target_speed, acceleration * _delta)
+	var move_dir = Input.get_axis("move_left", "move_right")
+	var target_speed = player._get_effective_move_speed() * move_dir
+	
+	if move_dir != 0:
+		player.velocity.x = move_toward(player.velocity.x, target_speed, accel * _delta)
 	else:
 		if player.is_on_floor():
-			if abs(player.velocity.x) < 1.0:
-				return get_node("../Idle")
-			else:
-				return get_node("../Slide")
-	
-	# 按跳跃 → 切到 Jump
-	if Input.is_action_just_pressed("jump"):
-		return get_node("../Jump")
-	
-	if not player.is_on_floor() and player.velocity.y >= 0:
-		player.is_falling_off_ledge = true
-		return get_node("../Fall")
-	
+			return player.get_state("Idle" if abs(player.velocity.x) < 1.0 else "Slide")
 	return null

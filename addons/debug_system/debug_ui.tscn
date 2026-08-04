@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://spn7kr13xhnt"]
+
+[ext_resource type="Script" uid="uid://i7j6b4jdaudd" path="res://addons/debug_system/debug_ui.gd" id="1_ft30v"]
+
+[node name="DebugUI" type="CanvasLayer" unique_id=266931556]
+script = ExtResource("1_ft30v")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1990616141]
+self_modulate = Color(1, 1, 1, 0.22352941)
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=1276531524]
+layout_mode = 2
+
+[node name="DynamicLabel" type="Label" parent="Panel/VBoxContainer" unique_id=871155383]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8

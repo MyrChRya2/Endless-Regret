@@ -11,6 +11,12 @@ func enter() -> void:
 	player.velocity.y = -base_jump_velocity
 	
 	
+func process(_delta: float) -> PlayerState:
+	player.play_anim("jump")
+	
+	return null
+	
+	
 func physics_process(_delta: float) -> PlayerState:
 	if Input.is_action_just_released("jump") and player.velocity.y < 0:
 		player.velocity.y *= player.jump_cut_multiplier
