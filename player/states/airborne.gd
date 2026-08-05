@@ -17,14 +17,11 @@ func enter() -> void:
 	player.is_falling_off_ledge = false
 
 
-func process(_delta: float) -> PlayerState:
-	player.update_air_animation()
-	return null
-	
-	
 func physics_process(_delta: float) -> PlayerState:
 	# 空中水平移动
 	player.air_move(_delta)
+	
+	player.update_air_animation()
 	
 	# 跳跃截断
 	if Input.is_action_just_released("jump") and player.velocity.y < 0:
@@ -65,9 +62,7 @@ func physics_process(_delta: float) -> PlayerState:
 		
 		# 落地后进入哪个状态
 		if abs(player.velocity.x) > 10.0:
-			if not Input.get_axis("move_left", "move_right"):
-				return get_node("../Slide")
-			else:
+			if Input.get_axis("move_left", "move_right"):
 				return get_node("../Run")
 		else:
 			return get_node("../Idle")

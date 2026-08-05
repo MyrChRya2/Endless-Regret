@@ -108,10 +108,6 @@ func _process(_delta: float) -> void:
 		var next_state = current_state.process(_delta)
 		if next_state != null:
 			change_state(next_state)
-	
-	if velocity.x != 0:
-		facing = FacingDir.RIGHT if velocity.x > 0 else FacingDir.LEFT
-		last_facing = facing
 		
 	_push_debug_data()
 	pass
@@ -120,19 +116,25 @@ func _process(_delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 	# 重力
 	velocity.y += gravity * _delta
+	# 朝向更新
+	if velocity.x != 0:
+		facing = FacingDir.RIGHT if velocity.x > 0 else FacingDir.LEFT
+		last_facing = facing
+	# 执行状态机逻辑
+	if current_state:
+		var next_state = current_state.physics_process(_delta)
+		if next_state != null:
+			change_state(next_state)
+	# 移动并处理碰撞
 	move_and_slide()
 	update_ground_friction_from_tile()
 	
+	# 落地重置资源
 	if is_on_floor():
 		velocity.y = 0
 		reset_remaining_air_jump()
 		can_coyote_jump = true
 		
-	if current_state:
-		var next_state = current_state.physics_process(_delta)
-		if next_state != null:
-			change_state(next_state)
-
 	
 func initialize_states() -> void:
 	#收集所有子状态并注入 player 引用
@@ -231,6 +233,7 @@ func initialize_facing() -> void:
 	last_facing = facing
 
 
+# 时间驱动地面动画
 func play_anim(anim_base: String) -> void:
 	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
 	var anim_name = anim_base + suffix
@@ -239,12 +242,16 @@ func play_anim(anim_base: String) -> void:
 
 # 物理驱动空中动画
 func update_air_animation() -> void:
-	var frame_count = player_anim.sprite_frames.get_frame_count("airborne")
+	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
+	var anim_name = "airborne" + suffix
+	
+	
+	var frame_count = player_anim.sprite_frames.get_frame_count(anim_name)
 	if frame_count <= 0:
 		return
 		
-	if player_anim.animation != "airborne":
-		player_anim.play("airborne")
+	if player_anim.animation != anim_name:
+		player_anim.play(anim_name)
 	
 	# 理论最大上升速度
 	var max_vel = sqrt(2.0 * gravity * _get_effective_jump_height())
@@ -281,3 +288,5 @@ func _push_debug_data() -> void:
 	DebugManager.set_value("player_vel_x", velocity.x)
 	DebugManager.set_value("player_vel_y", velocity.y)
 	DebugManager.set_value("is_on_floor", is_on_floor())
+	DebugManager.set_value("facing", facing)
+	DebugManager.set_value("last_facing", last_facing)
