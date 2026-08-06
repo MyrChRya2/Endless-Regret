@@ -114,6 +114,7 @@ func _process(_delta: float) -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	
 	# 重力
 	velocity.y += gravity * _delta
 	# 朝向更新
@@ -283,10 +284,19 @@ func _push_debug_data() -> void:
 	if not DebugManager:
 		return
 		
-	DebugManager.set_value("player_pos", global_position)
 	DebugManager.set_value("player_vel", velocity.length())
 	DebugManager.set_value("player_vel_x", velocity.x)
 	DebugManager.set_value("player_vel_y", velocity.y)
 	DebugManager.set_value("is_on_floor", is_on_floor())
 	DebugManager.set_value("facing", facing)
 	DebugManager.set_value("last_facing", last_facing)
+	DebugManager.set_value("now_pressed", _get_key_input())
+	
+	
+func _get_key_input() -> String:
+	if Input.is_key_pressed(KEY_A):
+		return "A"
+	elif Input.is_key_pressed(KEY_D):
+		return "D"
+	else:
+		return ""

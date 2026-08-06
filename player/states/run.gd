@@ -8,7 +8,7 @@ func physics_process(_delta: float) -> PlayerState:
 	var parent_result = super.physics_process(_delta)
 	if parent_result != null:
 		return parent_result
-		
+
 	player.play_anim("run")
 	
 	var move_dir = Input.get_axis("move_left", "move_right")
