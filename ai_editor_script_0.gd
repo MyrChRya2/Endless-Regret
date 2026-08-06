@@ -1,0 +1,153 @@
+@tool
+extends EditorScript
+
+func _run():
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://player/states/"))
+	
+	# 1. Rewrite climb_wall.gd with the full design
+	var path := "res://player/states/climb_wall.gd"
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_line("class_name PlayerStateClimbWall extends PlayerState")
+	f.store_line("")
+	f.store_line("## 进入 ClimbWall 时开始计时的时间窗口（秒）")
+	f.store_line("@export var grab_time_window: float = 0.4")
+	f.store_line("## 超时未抓墙时，沿墙面法线向外推开的初速度")
+	f.store_line("@export var push_off_velocity: float = 100.0")
+	f.store_line("## 推开后速度每帧衰减系数（0~1，越小衰减越快）")
+	f.store_line("@export var push_damping: float = 0.92")
+	f.store_line("## 下落（velocity.y < 0）时的重力倍率（0~1）")
+	f.store_line("@export var wall_slide_gravity_rate: float = 0.25")
+	f.store_line("## 跳跃脱离时沿墙面法线向外的水平初速度")
+	f.store_line("@export var wall_jump_velocity: float = 300.0")
+	f.store_line("")
+	f.store_line("var _wall_timer: float = 0.0")
+	f.store_line("var _wall_normal: Vector2 = Vector2.ZERO")
+	f.store_line("var _pushing_off: bool = false")
+	f.store_line("var _push_velocity: float = 0.0")
+	f.store_line("")
+	f.store_line("")
+	f.store_line("func enter() -> void:")
+	f.store_line("\t# 进入时保留 velocity.y（需求：进入 ClimbWall 时保留 velocity.y）")
+	f.store_line("\tplayer.can_wall_jump = false")
+	f.store_line("\tplayer.can_coyote_jump = false")
+	f.store_line("\tplayer.is_falling_off_ledge = false")
+	f.store_line("\t_wall_timer = grab_time_window")
+	f.store_line("\t_pushing_off = false")
+	f.store_line("\t_push_velocity = 0.0")
+	f.store_line("\t_wall_normal = _get_wall_normal()")
+	f.store_line("\t")
+	f.store_line("\t# TODO(动画): 进入 ClimbWall 时 velocity.y 正负变化可在此调用动画函数")
+	f.store_line("\t# 例如：if player.velocity.y < 0: play_anim(\"climb_up\") else: play_anim(\"climb_slide\")")
+	f.store_line("")
+	f.store_line("")
+	f.store_line("func exit() -> void:")
+	f.store_line("\t# TODO(动画): 退出 ClimbWall 时 velocity.y 正负变化可在此调用动画函数")
+	f.store_line("\tpass")
+	f.store_line("")
+	f.store_line("")
+	f.store_line("func handle_input(_event: InputEvent) -> PlayerState:")
+	f.store_line("\t# 跳跃脱离")
+	f.store_line("\tif Input.is_action_just_pressed(\"jump\"):")
+	f.store_line("\t\t# 沿墙面法线方向（指向墙外）施加水平初速度")
+	f.store_line("\t\tplayer.velocity.x = _wall_normal.x * wall_jump_velocity")
+	f.store_line("\t\t# 空中减速逻辑（player.air_move）会在下一帧接管并衰减该速度")
+	f.store_line("\t\tplayer._handle_jump()")
+	f.store_line("\t\treturn player.get_state(\"Airborne\")")
+	f.store_line("\t\t")
+	f.store_line("\t# 主动脱离：按下 Down 键")
+	f.store_line("\tif Input.is_action_just_pressed(\"ui_down\"):")
+	f.store_line("\t\t# 设置冷却锁，禁止再次进入 ClimbWall，直到完全离开墙面")
+	f.store_line("\t\tplayer.block_climb = true")
+	f.store_line("\t\treturn player.get_state(\"Airborne\")")
+	f.store_line("\treturn null")
+	f.store_line("")
+	f.store_line("")
+	f.store_line("func physics_process(_delta: float) -> PlayerState:")
+	f.store_line("\t# 1. 被动脱离：失墙")
+	f.store_line("\tif not player.is_on_wall():")
+	f.store_line("\t\t# 完全离开墙面，解除 block_climb 冷却锁")
+	f.store_line("\t\tplayer.block_climb = false")
+	f.store_line("\t\treturn player.get_state(\"Airborne\")")
+	f.store_line("\t\t")
+	f.store_line("\t# 2. 重力处理：下落减速（velocity.y < 0 时用倍率，否则 ×1.0）")
+	f.store_line("\tvar gravity_rate: float = wall_slide_gravity_rate if player.velocity.y < 0 else 1.0")
+	f.store_line("\tplayer.velocity.y += player.GRAVITATIONAL_ACCELERATION * player.NORMAL_GRAVITY_RATE * gravity_rate * _delta")
+	f.store_line("\t")
+	f.store_line("\t# 3. 超时推开机制")
+	f.store_line("\tvar input_dir: float = Input.get_axis(\"move_left\", \"move_right\")")
+	f.store_line("\tvar input_vec: Vector2 = Vector2(input_dir, 0.0)")
+	f.store_line("\t# 输入方向 与 -墙面法线 的点积 > 0 表示按住了朝向墙壁的方向键")
+	f.store_line("\tvar pressing_toward_wall: bool = input_vec.dot(-_wall_normal) > 0.0")
+	f.store_line("\t")
+	f.store_line("\tif pressing_toward_wall:")
+	f.store_line("\t\t# 主动抓墙：保持状态，计时器重置（下次再进重新计时）")
+	f.store_line("\t\t_wall_timer = grab_time_window")
+	f.store_line("\t\t_pushing_off = false")
+	f.store_line("\telse:")
+	f.store_line("\t\t_wall_timer -= _delta")
+	f.store_line("\t\tif _wall_timer <= 0.0 and not _pushing_off:")
+	f.store_line("\t\t\t# 超时：沿墙面法线向外推开")
+	f.store_line("\t\t\t_pushing_off = true")
+	f.store_line("\t\t\t_push_velocity = push_off_velocity")
+	f.store_line("\t\t\tplayer.velocity.x = _wall_normal.x * _push_velocity")
+	f.store_line("\t")
+	f.store_line("\tif _pushing_off:")
+	f.store_line("\t\t# 推开速度按阻尼系数衰减")
+	f.store_line("\t\t_push_velocity *= push_damping")
+	f.store_line("\t\tplayer.velocity.x = _wall_normal.x * _push_velocity")
+	f.store_line("\t\t# 一旦脱离 ClimbWall，进入 Airborne")
+	f.store_line("\t\tif _push_velocity < 1.0:")
+	f.store_line("\t\t\treturn player.get_state(\"Airborne\")")
+	f.store_line("\t")
+	f.store_line("\t# TODO(功能): 爬墙垂直向上移动预留（按住向上方向键时 velocity.y < 0 加速上移）")
+	f.store_line("\t# TODO(动画): 爬墙垂直向上移动动画预留")
+	f.store_line("\t")
+	f.store_line("\treturn null")
+	f.store_line("")
+	f.store_line("")
+	f.store_line("func _get_wall_normal() -> Vector2:")
+	f.store_line("\t# 从最近一次滑动碰撞中获取墙面法线")
+	f.store_line("\tvar collision := player.get_last_slide_collision()")
+	f.store_line("\tif collision:")
+	f.store_line("\t\treturn collision.get_normal()")
+	f.store_line("\treturn Vector2.ZERO")
+	f.close()
+	
+	# 2. Update player.gd to add block_climb lock and wall detection in Airborne
+	var player_path := "res://player/scripts/player.gd"
+	var pf := FileAccess.open(player_path, FileAccess.READ)
+	var player_text: String = pf.get_as_text()
+	pf.close()
+	
+	# Add block_climb lock variable after can_wall_jump
+	player_text = player_text.replace(
+		"# 蹬墙跳\nvar can_wall_jump: bool = true",
+		"# 蹬墙跳\nvar can_wall_jump: bool = true\n# 爬墙冷却锁（按下 Down 键后置 true，完全离开墙面后重置 false）\nvar block_climb: bool = false"
+	)
+	# Add wall_normal getter helper at end of file
+	player_text = player_text.replace(
+		"func _handle_jump() -> void:",
+		"# 获取当前接触墙面的法线（指向墙外）\nfunc get_wall_normal() -> Vector2:\n\tvar collision := get_last_slide_collision()\n\tif collision:\n\t\treturn collision.get_normal()\n\treturn Vector2.ZERO\n\n\nfunc _handle_jump() -> void:"
+	)
+	
+	var pw := FileAccess.open(player_path, FileAccess.WRITE)
+	pw.store_string(player_text)
+	pw.close()
+	
+	# 3. Update airborne.gd to check block_climb before entering ClimbWall
+	var air_path := "res://player/states/airborne.gd"
+	var af := FileAccess.open(air_path, FileAccess.READ)
+	var air_text: String = af.get_as_text()
+	af.close()
+	
+	air_text = air_text.replace(
+		"\t# 贴墙检测\n\tif player.is_on_wall() and not player.is_on_floor():",
+		"\t# 贴墙检测（block_climb 为 true 时禁止进入 ClimbWall）\n\tif player.is_on_wall() and not player.is_on_floor() and not player.block_climb:"
+	)
+	
+	var aw := FileAccess.open(air_path, FileAccess.WRITE)
+	aw.store_string(air_text)
+	aw.close()
+	
+	EditorInterface.get_resource_filesystem().scan()
+	print("ClimbWall 状态机已重构：新增抓墙计时、推开脱离、Down 键冷却锁、跳跃脱离、重力减速倍率，并预留动画/爬墙代码位置。")

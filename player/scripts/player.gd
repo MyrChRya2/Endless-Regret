@@ -56,6 +56,8 @@ var is_falling_off_ledge: bool = false
 
 # 蹬墙跳
 var can_wall_jump: bool = true
+# 爬墙冷却锁（按下 Down 键后置 true，完全离开墙面后重置 false）
+var block_climb: bool = false
 
 #endregion
 
@@ -121,6 +123,10 @@ func _physics_process(_delta: float) -> void:
 	# 重力
 	velocity.y += gravity * _delta
 	
+	# 移动并处理碰撞
+	move_and_slide()
+	update_ground_friction_from_tile()
+	
 	# 朝向更新
 	var input_dir = Input.get_axis("move_left", "move_right")
 	if input_dir != 0.0:
@@ -131,19 +137,12 @@ func _physics_process(_delta: float) -> void:
 		var next_state = current_state.physics_process(_delta)
 		if next_state != null:
 			change_state(next_state)
-			
-	# 移动并处理碰撞
-	move_and_slide()
-	update_ground_friction_from_tile()
 	
-	# 落地重置资源
-	if is_on_floor():
+	# 落地重置资源（仅在 velocity.y >= 0 时归零，避免清除跳跃速度）
+	if is_on_floor() and velocity.y >= 0:
 		velocity.y = 0
 		reset_remaining_air_jump()
 		can_coyote_jump = true
-	elif is_on_wall():
-		reset_remaining_air_jump()
-		can_wall_jump = true
 	
 func initialize_states() -> void:
 	#收集所有子状态并注入 player 引用
@@ -301,6 +300,8 @@ func _push_debug_data() -> void:
 	DebugManager.set_value("facing", facing)
 	DebugManager.set_value("last_facing", last_facing)
 	DebugManager.set_value("now_pressed", _get_key_input())
+	DebugManager.set_value("can_coyote_jump", can_coyote_jump)
+	DebugManager.set_value("remaining_air_jump", remaining_air_jumps)
 	
 	# 临时按键抓取
 func _get_key_input() -> String:
@@ -316,3 +317,10 @@ func set_facing(dir: FacingDir) -> void:
 	if facing != dir:
 		facing = dir
 		last_facing = dir
+
+
+func _handle_jump() -> void:
+	var jump_vel := sqrt(2 * gravity * _get_effective_jump_height())
+	velocity.y = -jump_vel
+	
+	

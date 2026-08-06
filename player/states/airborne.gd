@@ -1,19 +1,13 @@
 class_name PlayerStateAirborne extends PlayerState
 
 
-var _jumped_from_ground: bool
+
 
 
 func enter() -> void:
 	if player.is_on_floor():
-		var jump_vel := sqrt(2 * player.gravity * player._get_effective_jump_height())
-		player.velocity.y = -jump_vel
+		player._handle_jump()
 		player.can_coyote_jump = false
-		player.can_coyote_jump = false
-		_jumped_from_ground = true
-		
-	else:
-		_jumped_from_ground = false
 		
 	player.is_falling_off_ledge = false
 
@@ -36,16 +30,11 @@ func physics_process(_delta: float) -> PlayerState:
 			var jump_vel := sqrt(2 * player.gravity * player._get_effective_jump_height())
 			player.velocity.y = -jump_vel
 			return null
-		if player.can_wall_jump:
-			player.can_wall_jump = false
-			var jump_vel := sqrt(2 * player.gravity * player._get_effective_jump_height())
-			player.velocity.y = -jump_vel
-			return null
+			
 		# 常规多段跳
 		if player.remaining_air_jumps > 0:
 			player.remaining_air_jumps -=1
-			var jump_vel := sqrt(2 * player.gravity * player._get_effective_jump_height())
-			player.velocity.y = -jump_vel
+			player._handle_jump()
 			return null
 			
 	# 跳跃预输入
@@ -54,23 +43,16 @@ func physics_process(_delta: float) -> PlayerState:
 	if player.jump_buffer_timer > 0:
 		player.jump_buffer_timer = max(0, player.jump_buffer_timer - _delta)
 		
-	# 贴墙检测
-	if player.is_on_wall():
-		if player.jump_buffer_timer > 0:
-			player.jump_buffer_timer = 0
-			var jump_vel := sqrt(2 * player.gravity * player._get_effective_jump_height())
-			player.velocity.y = -jump_vel
-			player.can_wall_jump = false
-			return null
-		
+	# 贴墙检测（block_climb 为 true 时禁止进入 ClimbWall）
+	if player.is_on_wall() and not player.is_on_floor() and not player.block_climb:
+		return get_node("../ClimbWall")
 		
 	# 落地检测
 	if player.is_on_floor() and player.velocity.y >= 0:
 		# 落地前预输入，暂时先设为跳跃，即重回Airborn
 		if player.jump_buffer_timer > 0:
 			player.jump_buffer_timer = 0
-			var jump_vel := sqrt(2 * player.gravity * player._get_effective_jump_height())
-			player.velocity.y = -jump_vel
+			player._handle_jump()
 			player.can_coyote_jump = false
 			return null
 			
