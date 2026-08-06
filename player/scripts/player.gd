@@ -53,6 +53,10 @@ var jump_buffer_timer: float = 0.0
 var can_coyote_jump: bool = true
 # 平面边缘掉落检测
 var is_falling_off_ledge: bool = false
+
+# 蹬墙跳
+var can_wall_jump: bool = true
+
 #endregion
 
 #region /// gravity
@@ -114,18 +118,20 @@ func _process(_delta: float) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	
 	# 重力
 	velocity.y += gravity * _delta
+	
 	# 朝向更新
-	if velocity.x != 0:
-		facing = FacingDir.RIGHT if velocity.x > 0 else FacingDir.LEFT
-		last_facing = facing
+	var input_dir = Input.get_axis("move_left", "move_right")
+	if input_dir != 0.0:
+		set_facing(FacingDir.RIGHT if input_dir > 0 else FacingDir.LEFT)
+		
 	# 执行状态机逻辑
 	if current_state:
 		var next_state = current_state.physics_process(_delta)
 		if next_state != null:
 			change_state(next_state)
+			
 	# 移动并处理碰撞
 	move_and_slide()
 	update_ground_friction_from_tile()
@@ -135,7 +141,9 @@ func _physics_process(_delta: float) -> void:
 		velocity.y = 0
 		reset_remaining_air_jump()
 		can_coyote_jump = true
-		
+	elif is_on_wall():
+		reset_remaining_air_jump()
+		can_wall_jump = true
 	
 func initialize_states() -> void:
 	#收集所有子状态并注入 player 引用
@@ -244,8 +252,7 @@ func play_anim(anim_base: String) -> void:
 # 物理驱动空中动画
 func update_air_animation() -> void:
 	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
-	var anim_name = "airborne" + suffix
-	
+	var anim_name: String = ("airborne" if not is_on_wall_only() else "climb") + suffix
 	
 	var frame_count = player_anim.sprite_frames.get_frame_count(anim_name)
 	if frame_count <= 0:
@@ -267,7 +274,10 @@ func update_air_animation() -> void:
 	# 四舍五入到帧索引
 	var index = int(round(t * (frame_count - 1)))
 	player_anim.frame = index
-
+	
+	DebugManager.set_value("now_air_anim_dir", suffix)
+	
+	
 	
 # 空中水平移动
 func air_move(_delta: float) -> void:
@@ -292,7 +302,7 @@ func _push_debug_data() -> void:
 	DebugManager.set_value("last_facing", last_facing)
 	DebugManager.set_value("now_pressed", _get_key_input())
 	
-	
+	# 临时按键抓取
 func _get_key_input() -> String:
 	if Input.is_key_pressed(KEY_A):
 		return "A"
@@ -300,3 +310,9 @@ func _get_key_input() -> String:
 		return "D"
 	else:
 		return ""
+
+
+func set_facing(dir: FacingDir) -> void:
+	if facing != dir:
+		facing = dir
+		last_facing = dir
