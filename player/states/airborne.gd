@@ -36,6 +36,9 @@ func physics_process(_delta: float) -> PlayerState:
 		# 重置预输入倒计时
 		player.jump_buffer_timer = player.jump_buffer_time
 		
+	# 贴墙检测（优先于其他切换）
+	if player.is_on_wall() and not player.is_on_floor():
+		return player.get_state("Wall")
 	# 落地检测
 	if player.is_on_floor() and player.velocity.y >= 0:
 		# 落地前预输入，暂时先设为跳跃，即重回Airborn

@@ -86,6 +86,8 @@ enum FacingDir { LEFT, RIGHT }
 var facing: FacingDir
 var last_facing: FacingDir
 
+var _missing_anim_warned: Dictionary = {}
+
 @onready var player_anim: AnimatedSprite2D = %PlayerAnim
 
 #endregion
@@ -238,44 +240,64 @@ func reset_remaining_air_jump() -> int:
 func initialize_facing() -> void:
 	facing = FacingDir.RIGHT
 	last_facing = facing
+	
+	
+#region /// 动画方法
 
-
+func _hendle_anim(anim_name: String) -> bool:
+	if player_anim.sprite_frames.has_animation(anim_name):
+		# 动画存在，正常播放（避免重复播放同一个动画）
+		if player_anim.animation != anim_name:
+			player_anim.play(anim_name)
+		return true
+	else:
+		# 动画缺失：输出错误，并尝试播放 error 占位动画
+		if not _missing_anim_warned.has(anim_name):
+			_missing_anim_warned[anim_name] = true
+			push_error("动画 '", anim_name, "' 不存在，使用 error 占位动画")
+			
+		if player_anim.sprite_frames.has_animation("error"):
+			if player_anim.animation != "error":
+				player_anim.play("error")
+		else:
+			# 连 error 动画都没有，则停止动画并显示第一帧（或保持当前帧）
+			player_anim.stop()
+			
+	DebugManager.set_value("current_anim", anim_name)
+	
+	return false
+	
+	
+	
 # 时间驱动地面动画
 func play_anim(anim_base: String) -> void:
 	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
 	var anim_name = anim_base + suffix
-	if player_anim.animation != anim_name:
-		player_anim.play(anim_name)
+	_hendle_anim(anim_name)
 
 # 物理驱动空中动画
 func update_air_animation() -> void:
-	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
+	var suffix: String = "_right" if last_facing == FacingDir.RIGHT else "_left"
 	var anim_name: String = ("airborne") + suffix
 	
-	var frame_count = player_anim.sprite_frames.get_frame_count(anim_name)
-	if frame_count <= 0:
+	if not _hendle_anim(anim_name):
 		return
 		
 	if player_anim.animation != anim_name:
 		player_anim.play(anim_name)
-	
-	# 理论最大上升速度
+		
 	var max_vel = sqrt(2.0 * gravity * _get_effective_jump_height())
-	# 防止除以0
 	if max_vel <= 0.0:
 		player_anim.frame = 0
 		return
 		
-	# 将垂直速度映射到 [0, 1] 区间 -> [-max_vel, +max_vel]
 	var t = clamp((velocity.y + max_vel) / (2.0 * max_vel), 0.0, 1.0)
-	
-	# 四舍五入到帧索引
-	var index = int(round(t * (frame_count - 1)))
+	var index = int(round(t * (player_anim.sprite_frames.get_frame_count(anim_name) - 1)))
 	player_anim.frame = index
-	
-	DebugManager.set_value("now_air_anim_dir", suffix)
 		
-		
+#endregion
+
+
 	# 调试HUD数据抓取
 func _push_debug_data() -> void:
 	if not DebugManager:
@@ -290,6 +312,7 @@ func _push_debug_data() -> void:
 	DebugManager.set_value("now_pressed", _get_key_input())
 	DebugManager.set_value("can_coyote_jump", can_coyote_jump)
 	DebugManager.set_value("remaining_air_jump", remaining_air_jumps)
+
 	
 	# 临时按键抓取
 func _get_key_input() -> String:
