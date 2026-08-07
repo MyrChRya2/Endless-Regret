@@ -1,11 +1,8 @@
 class_name PlayerStateAirborne extends PlayerState
 
 
-
-
-
 func enter() -> void:
-	if player.is_on_floor():
+	if player.is_on_floor() and player.velocity.y >= 0:
 		player._handle_jump()
 		player.can_coyote_jump = false
 		
@@ -14,7 +11,7 @@ func enter() -> void:
 
 func physics_process(_delta: float) -> PlayerState:
 	# 空中水平移动
-	player.air_move(_delta)
+	player._handle_air_move(_delta, Input.get_axis("move_left", "move_right"))
 	
 	player.update_air_animation()
 	
@@ -27,8 +24,7 @@ func physics_process(_delta: float) -> PlayerState:
 		# 优先计算土狼跳
 		if player.can_coyote_jump:
 			player.can_coyote_jump = false
-			var jump_vel := sqrt(2 * player.gravity * player._get_effective_jump_height())
-			player.velocity.y = -jump_vel
+			player._handle_jump()
 			return null
 			
 		# 常规多段跳
@@ -37,15 +33,8 @@ func physics_process(_delta: float) -> PlayerState:
 			player._handle_jump()
 			return null
 			
-	# 跳跃预输入
-	if Input.is_action_just_pressed("jump"):
+		# 重置预输入倒计时
 		player.jump_buffer_timer = player.jump_buffer_time
-	if player.jump_buffer_timer > 0:
-		player.jump_buffer_timer = max(0, player.jump_buffer_timer - _delta)
-		
-	# 贴墙检测（block_climb 为 true 时禁止进入 ClimbWall）
-	if player.is_on_wall() and not player.is_on_floor() and not player.block_climb:
-		return get_node("../ClimbWall")
 		
 	# 落地检测
 	if player.is_on_floor() and player.velocity.y >= 0:
@@ -56,13 +45,13 @@ func physics_process(_delta: float) -> PlayerState:
 			player.can_coyote_jump = false
 			return null
 			
-		player.velocity.y = 0
-		
 		# 落地后进入哪个状态
-		if abs(player.velocity.x) > 10.0:
-			if Input.get_axis("move_left", "move_right"):
-				return get_node("../Run")
-		else:
-			return get_node("../Idle")
-			
+		if Input.get_axis("move_left", "move_right") and abs(player.velocity.x) > 10.0:
+			return get_node("../Run")
+		return get_node("../Idle")
+		
+	# 预输入倒计时启动
+	if player.jump_buffer_timer > 0:
+		player.jump_buffer_timer = max(0, player.jump_buffer_timer - _delta)
+		
 	return null

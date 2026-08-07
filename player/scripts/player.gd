@@ -14,6 +14,8 @@ var current_state: PlayerState = null
 #region /// run
 # 默认奔跑速度
 const default_run_speed: float = 200.0
+# 默认奔跑加速度
+@export var accel: float = 2400.0
 # 默认奔跑倍率
 @export var DEFAULT_MOVE_SPEED_MULTIPLIER: float = 1.0
 # 移速倍率表
@@ -35,9 +37,9 @@ var jump_height_modifiers: Array[float] = [DEFAULT_JUMP_HEIGHT_MULTIPLIER]
 # 空中移动移速倍率
 const air_move_speed: float = 0.6
 # 空中加速灵敏度
-@export var air_acceleration: float = 800.0
+@export var air_accel: float = 800.0
 # 空中速度衰减灵敏度
-@export var air_deceleration: float = 400.0
+@export var air_decel: float = 400.0
 
 # 多端跳次数
 var extra_air_jumps: int = 1
@@ -54,10 +56,6 @@ var can_coyote_jump: bool = true
 # 平面边缘掉落检测
 var is_falling_off_ledge: bool = false
 
-# 蹬墙跳
-var can_wall_jump: bool = true
-# 爬墙冷却锁（按下 Down 键后置 true，完全离开墙面后重置 false）
-var block_climb: bool = false
 
 #endregion
 
@@ -91,6 +89,7 @@ var last_facing: FacingDir
 @onready var player_anim: AnimatedSprite2D = %PlayerAnim
 
 #endregion
+
 
 var MAX_JUMP_VEL: float
 
@@ -251,7 +250,7 @@ func play_anim(anim_base: String) -> void:
 # 物理驱动空中动画
 func update_air_animation() -> void:
 	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
-	var anim_name: String = ("airborne" if not is_on_wall_only() else "climb") + suffix
+	var anim_name: String = ("airborne") + suffix
 	
 	var frame_count = player_anim.sprite_frames.get_frame_count(anim_name)
 	if frame_count <= 0:
@@ -275,17 +274,6 @@ func update_air_animation() -> void:
 	player_anim.frame = index
 	
 	DebugManager.set_value("now_air_anim_dir", suffix)
-	
-	
-	
-# 空中水平移动
-func air_move(_delta: float) -> void:
-	var move_direction = Input.get_axis("move_left", "move_right")
-	var target_speed = move_direction * _get_effective_move_speed() * air_move_speed
-	if move_direction != 0:
-		velocity.x = move_toward(velocity.x, target_speed, air_acceleration * _delta)
-	else:
-		velocity.x = move_toward(velocity.x, 0.0, air_deceleration * _delta)
 		
 		
 	# 调试HUD数据抓取
@@ -319,8 +307,25 @@ func set_facing(dir: FacingDir) -> void:
 		last_facing = dir
 
 
+# 垂直移动
 func _handle_jump() -> void:
 	var jump_vel := sqrt(2 * gravity * _get_effective_jump_height())
 	velocity.y = -jump_vel
 	
 	
+# 水平移动
+func _handle_h_move(_delta: float, move_dir) -> void:
+	var target_speed = move_dir * _get_effective_move_speed()
+	if move_dir != 0:
+		velocity.x = move_toward(velocity.x, target_speed, accel * _delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, accel * _delta)
+		
+		
+# 空中水平移动
+func _handle_air_move(_delta: float, move_dir) -> void:
+	var target_speed = move_dir * _get_effective_move_speed()
+	if move_dir != 0:
+		velocity.x = move_toward(velocity.x, target_speed, air_accel * _delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, air_decel * _delta)

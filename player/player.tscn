@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://lrdiubkykuql" path="res://player/scripts/player.gd" id="1_oul6g"]
 [ext_resource type="Script" uid="uid://b2b4mqfliv2vc" path="res://player/states/idle.gd" id="2_g1dw6"]
 [ext_resource type="Script" uid="uid://oqpd00rfqmu5" path="res://player/states/run.gd" id="3_yw30f"]
-[ext_resource type="Script" uid="uid://icpjd27mc1j2" path="res://player/states/climb_wall.gd" id="7_boad6"]
 [ext_resource type="Script" uid="uid://bomcvf3io767f" path="res://player/states/airborne.gd" id="8_rgyib"]
 [ext_resource type="Texture2D" uid="uid://88u4xpxjow2q" path="res://assets/game/character/Player_idle.png" id="9_2ieo8"]
 [ext_resource type="Texture2D" uid="uid://dnshoyp7fv6k6" path="res://assets/game/character/Player_move.png" id="9_8t03j"]
@@ -230,7 +229,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_n0b8q")
 }],
-"loop": true,
+"loop": 1,
 "name": &"airborne_left",
 "speed": 5.0
 }, {
@@ -262,7 +261,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_knn7v")
 }],
-"loop": false,
+"loop": 0,
 "name": &"airborne_right",
 "speed": 5.0
 }, {
@@ -273,7 +272,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jfgyi")
 }],
-"loop": true,
+"loop": 1,
 "name": &"climb_left",
 "speed": 5.0
 }, {
@@ -281,7 +280,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_g6k8r")
 }],
-"loop": true,
+"loop": 1,
 "name": &"climb_right",
 "speed": 5.0
 }, {
@@ -298,7 +297,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_wodsf")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle_left",
 "speed": 5.0
 }, {
@@ -315,7 +314,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_c35mf")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle_right",
 "speed": 5.0
 }, {
@@ -344,7 +343,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5ejfk")
 }],
-"loop": true,
+"loop": 1,
 "name": &"run_left",
 "speed": 15.0
 }, {
@@ -373,7 +372,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fjxoa")
 }],
-"loop": true,
+"loop": 1,
 "name": &"run_right",
 "speed": 15.0
 }, {
@@ -384,7 +383,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2ieo8")
 }],
-"loop": false,
+"loop": 0,
 "name": &"slide_left",
 "speed": 10.0
 }, {
@@ -395,7 +394,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ge24q")
 }],
-"loop": false,
+"loop": 0,
 "name": &"slide_right",
 "speed": 10.0
 }]
@@ -410,7 +409,7 @@ script = ExtResource("1_oul6g")
 unique_name_in_owner = true
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_wodsf")
-animation = &"climb_left"
+animation = &"idle_right"
 autoplay = "idle_right"
 
 [node name="States" type="Node" parent="." unique_id=1340329346]
@@ -423,9 +422,6 @@ script = ExtResource("3_yw30f")
 
 [node name="Airborne" type="Node" parent="States" unique_id=604632069]
 script = ExtResource("8_rgyib")
-
-[node name="ClimbWall" type="Node" parent="States" unique_id=1372526678]
-script = ExtResource("7_boad6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666999116]
 position = Vector2(0, -13.5)
