@@ -94,7 +94,7 @@ var _missing_anim_warned: Dictionary = {}
 
 
 var MAX_JUMP_VEL: float
-
+var current_jump_type: String = ""
 
 func  _ready() -> void:
 	# 初始化 states
@@ -146,15 +146,24 @@ func _physics_process(_delta: float) -> void:
 		can_coyote_jump = true
 	
 func initialize_states() -> void:
-	#收集所有子状态并注入 player 引用
-	for child in states_machine_container.get_children():
+	_recursive_init(states_machine_container)
+	var default_state = get_state("Idle")
+	if default_state:
+		current_state = default_state
+		current_state.enter()
+		print("✅ 状态机初始化完成，当前状态：", current_state.name)
+	else:
+		print("❌ 错误：找不到 ", default_state, " 状态！")
+	
+	
+func _recursive_init(node: Node) -> void:
+	for child in node.get_children():
 		if child is PlayerState:
 			child.player = self
 			child.init()
-	#默认进入第一个状态
-	if states_machine_container.get_child_count() > 0:
-		current_state = states_machine_container.get_child(0)
-		current_state.enter()
+	# 持续递归
+		if child.get_child_count() > 0:
+			_recursive_init(child)
 	
 	
 func change_state(new_state:PlayerState) -> void:
@@ -178,8 +187,8 @@ func change_state(new_state:PlayerState) -> void:
 	current_state.enter()
 	
 	
-func get_state(_name: String) -> PlayerState:
-	return states_machine_container.get_node(_name)
+func get_state(path: String) -> PlayerState:
+	return states_machine_container.get_node(path)
 	
 	
 # 当前移动倍率
@@ -312,7 +321,8 @@ func _push_debug_data() -> void:
 	DebugManager.set_value("now_pressed", _get_key_input())
 	DebugManager.set_value("can_coyote_jump", can_coyote_jump)
 	DebugManager.set_value("remaining_air_jump", remaining_air_jumps)
-
+	DebugManager.set_value("jump_type", current_jump_type)
+	
 	
 	# 临时按键抓取
 func _get_key_input() -> String:

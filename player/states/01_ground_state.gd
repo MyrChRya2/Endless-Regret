@@ -5,6 +5,8 @@ class_name GroundState extends PlayerState
 func physics_process(_delta: float) -> PlayerState:
 	# 通用跳跃检测
 	if Input.is_action_just_pressed("jump"):
+		player.current_jump_type = "Ground Jump"
+		player._handle_jump()
 		return player.get_state("Airborne")
 		
 	# 通用边缘掉落检测

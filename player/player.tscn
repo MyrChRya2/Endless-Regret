@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://lrdiubkykuql" path="res://player/scripts/player.gd" id="1_oul6g"]
 [ext_resource type="Script" uid="uid://b2b4mqfliv2vc" path="res://player/states/idle.gd" id="2_g1dw6"]
 [ext_resource type="Script" uid="uid://oqpd00rfqmu5" path="res://player/states/run.gd" id="3_yw30f"]
-[ext_resource type="Script" uid="uid://6bkfshf4vgoh" path="res://player/states/01_wall_state.gd" id="7_boad6"]
+[ext_resource type="Script" uid="uid://4s4yy0y53jlq" path="res://player/states/wall_grab.gd" id="7_boad6"]
 [ext_resource type="Script" uid="uid://bomcvf3io767f" path="res://player/states/airborne.gd" id="8_rgyib"]
 [ext_resource type="Texture2D" uid="uid://88u4xpxjow2q" path="res://assets/game/character/Player_idle.png" id="9_2ieo8"]
 [ext_resource type="Texture2D" uid="uid://dnshoyp7fv6k6" path="res://assets/game/character/Player_move.png" id="9_8t03j"]
@@ -444,6 +444,8 @@ script = ExtResource("3_yw30f")
 script = ExtResource("8_rgyib")
 
 [node name="Wall" type="Node" parent="States" unique_id=1170694371]
+
+[node name="WallGrab" type="Node" parent="States/Wall" unique_id=1539065211]
 script = ExtResource("7_boad6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666999116]

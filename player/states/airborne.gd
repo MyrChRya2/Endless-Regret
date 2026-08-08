@@ -3,11 +3,10 @@ class_name PlayerStateAirborne extends PlayerState
 
 func enter() -> void:
 	if player.is_on_floor() and player.velocity.y >= 0:
-		player._handle_jump()
 		player.can_coyote_jump = false
 		
 	player.is_falling_off_ledge = false
-
+	player.jump_buffer_timer = 0.0
 
 func physics_process(_delta: float) -> PlayerState:
 	# 空中水平移动
@@ -24,12 +23,14 @@ func physics_process(_delta: float) -> PlayerState:
 		# 优先计算土狼跳
 		if player.can_coyote_jump:
 			player.can_coyote_jump = false
+			player.current_jump_type = "Coyote Jump"
 			player._handle_jump()
 			return null
 			
 		# 常规多段跳
 		if player.remaining_air_jumps > 0:
 			player.remaining_air_jumps -=1
+			player.current_jump_type = "Air Jump"
 			player._handle_jump()
 			return null
 			
@@ -38,12 +39,20 @@ func physics_process(_delta: float) -> PlayerState:
 		
 	# 贴墙检测（优先于其他切换）
 	if player.is_on_wall() and not player.is_on_floor():
-		return player.get_state("Wall")
+		var move_dir = Input.get_axis("move_left", "move_right")
+		var wall_normal = player.get_wall_normal()
+		if wall_normal != Vector2.ZERO:
+			var wall_dir = -sign(wall_normal.x)
+			if move_dir == 0 or sign(move_dir) == wall_dir:
+				return player.get_state("Wall/WallGrab")
+		
+		
 	# 落地检测
 	if player.is_on_floor() and player.velocity.y >= 0:
 		# 落地前预输入，暂时先设为跳跃，即重回Airborn
 		if player.jump_buffer_timer > 0:
 			player.jump_buffer_timer = 0
+			player.current_jump_type = "Buffer Jump"
 			player._handle_jump()
 			player.can_coyote_jump = false
 			return null
@@ -57,4 +66,5 @@ func physics_process(_delta: float) -> PlayerState:
 	if player.jump_buffer_timer > 0:
 		player.jump_buffer_timer = max(0, player.jump_buffer_timer - _delta)
 		
+	DebugManager.set_value("jump_buffer_timer", player.jump_buffer_timer)
 	return null
