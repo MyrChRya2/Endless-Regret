@@ -63,6 +63,7 @@ var is_falling_off_ledge: bool = false
 @export var GRAVITATIONAL_ACCELERATION: float = 980.0
 @export var NORMAL_GRAVITY_RATE: float = 1.0
 var gravity: float = GRAVITATIONAL_ACCELERATION * NORMAL_GRAVITY_RATE
+var gravity_enabled: bool = true
 #endregion
 
 #region /// friction
@@ -122,7 +123,8 @@ func _process(_delta: float) -> void:
 
 func _physics_process(_delta: float) -> void:
 	# 重力
-	velocity.y += gravity * _delta
+	if gravity_enabled:
+		velocity.y += gravity * _delta
 	
 	# 移动并处理碰撞
 	move_and_slide()
@@ -242,7 +244,7 @@ func update_ground_friction_from_tile() -> void:
 	ground_friction_multiplier = multiplier
 	
 func reset_remaining_air_jump() -> int:
-	remaining_air_jumps = extra_air_jumps	
+	remaining_air_jumps = extra_air_jumps
 	return remaining_air_jumps
 	
 
