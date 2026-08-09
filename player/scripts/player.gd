@@ -93,6 +93,7 @@ var _missing_anim_warned: Dictionary = {}
 
 #endregion
 
+var can_wall_climb: bool = true
 
 var MAX_JUMP_VEL: float
 var current_jump_type: String = ""

@@ -7,6 +7,9 @@ func enter() -> void:
 		
 	player.is_falling_off_ledge = false
 	player.jump_buffer_timer = 0.0
+	
+	player.can_wall_climb = true
+	
 
 func physics_process(_delta: float) -> PlayerState:
 	# 空中水平移动
@@ -38,15 +41,14 @@ func physics_process(_delta: float) -> PlayerState:
 		player.jump_buffer_timer = player.jump_buffer_time
 		
 	# 贴墙检测（优先于其他切换）
-	if player.is_on_wall() and not player.is_on_floor():
-		var move_dir = Input.get_axis("move_left", "move_right")
-		var wall_normal = player.get_wall_normal()
-		if wall_normal != Vector2.ZERO:
-			var wall_dir = -sign(wall_normal.x)
-			if move_dir == 0 or sign(move_dir) == wall_dir:
-				return player.get_state("Wall/WallGrab")
-		
-		
+	if player.is_on_wall():
+		if not player.is_on_floor():
+			var move_dir = Input.get_axis("move_left", "move_right")
+			var wall_normal = player.get_wall_normal()
+			if wall_normal != Vector2.ZERO:
+				var wall_dir = -sign(wall_normal.x)
+				if move_dir == 0 or sign(move_dir) == wall_dir:
+					return player.get_state("Wall/WallGrab")
 	# 落地检测
 	if player.is_on_floor() and player.velocity.y >= 0:
 		# 落地前预输入，暂时先设为跳跃，即重回Airborn

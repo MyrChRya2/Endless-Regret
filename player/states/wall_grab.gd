@@ -24,7 +24,7 @@ func physics_process(_delta: float) -> PlayerState:
 		if Input.is_action_just_pressed("jump"):
 			return player.get_state("Wall/WallJump")
 			
-		if Input.is_action_pressed("move_up") and is_pressing_towards_wall():
+		if Input.is_action_pressed("move_up") and is_pressing_towards_wall() and player.can_wall_climb:
 			return player.get_state("Wall/WallClimb")
 				
 		if handle_hold_timer(_delta):

@@ -15,18 +15,22 @@ func enter() -> void:
 	reset_timers()
 	player.play_anim("wall_climb")
 	player.gravity_enabled = false
-	
-	phase = ClimbPhase.ACCELERATING
-	target_velocity_y = -climb_speed
-	
+	if abs(player.velocity.y) > climb_speed:
+		phase = ClimbPhase.DECELERATING
+		target_velocity_y = 0.0
+	else:
+		phase = ClimbPhase.ACCELERATING
+		target_velocity_y = -climb_speed
+		
 	
 func exit() -> void:
 	player.gravity_enabled = true
+	player.can_wall_climb = false
 	
 	
 func physics_process(_delta: float) -> PlayerState:
 	player.velocity.x = 0
-	
+	DebugManager.set_value("ClimbPhase", phase)
 	if Input.is_action_pressed("move_up") and is_pressing_towards_wall():
 		match phase:
 			ClimbPhase.ACCELERATING:
@@ -51,9 +55,7 @@ func physics_process(_delta: float) -> PlayerState:
 	else:
 		if player.is_on_wall():
 			return player.get_state("Wall/WallGrab")
-		else:
-			return player.get_state("Airborne")
 		
-	if not player.is_on_wall():
-		return player.get_state("Airborne")
+	#if not player.is_on_wall():
+		#return player.get_state("Airborne")
 	return null
