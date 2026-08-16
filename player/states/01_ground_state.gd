@@ -8,6 +8,7 @@ func physics_process(_delta: float) -> PlayerState:
 		player.current_jump_type = "Ground Jump"
 		player.can_coyote_jump = false
 		player._handle_jump()
+		player.current_jump_type = player.JumpType.GROUND
 		return player.get_state("Airborne")
 		
 	# 通用边缘掉落检测

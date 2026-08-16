@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0sh4mk5t2fb7"
-path="res://.godot/imported/tilled_ground.png-ca1119ee0d9018daa763d757e6af73a4.ctex"
+uid="uid://cx30egfmt40rq"
+path="res://.godot/imported/debug_bricks.png-e2d175b72be7c031a22500cd71cc7c45.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/game/tilesets/tilled_ground.png"
-dest_files=["res://.godot/imported/tilled_ground.png-ca1119ee0d9018daa763d757e6af73a4.ctex"]
+source_file="res://assets/game/tilesets/test_playground/debug_bricks.png"
+dest_files=["res://.godot/imported/debug_bricks.png-e2d175b72be7c031a22500cd71cc7c45.ctex"]
 
 [params]
 

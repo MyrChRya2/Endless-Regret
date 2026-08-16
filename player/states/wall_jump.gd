@@ -9,8 +9,7 @@ func enter() -> void:
 	var wall_dir = get_wall_direction()
 	if wall_dir != 0:
 		player.velocity.x = -wall_dir * 300.0
-		
-	player.play_anim("wall_jump")
+
 	
 func physics_process(_delta: float) -> PlayerState:
 	return player.get_state("Airborne")

@@ -5,7 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://okks46m125gv" path="res://assets/game/character/error.png" id="3_2ieo8"]
 [ext_resource type="Script" uid="uid://oqpd00rfqmu5" path="res://player/states/run.gd" id="3_yw30f"]
 [ext_resource type="Script" uid="uid://4s4yy0y53jlq" path="res://player/states/wall_grab.gd" id="7_boad6"]
-[ext_resource type="Script" uid="uid://b4r6tfysaqe4m" path="res://player/states/wall_climb.gd" id="8_8t03j"]
 [ext_resource type="Script" uid="uid://d2i13mnuej48o" path="res://player/states/wall_jump.gd" id="8_hg6s5"]
 [ext_resource type="Script" uid="uid://bomcvf3io767f" path="res://player/states/airborne.gd" id="8_rgyib"]
 [ext_resource type="Texture2D" uid="uid://88u4xpxjow2q" path="res://assets/game/character/Player_idle.png" id="9_2ieo8"]
@@ -542,9 +541,6 @@ script = ExtResource("8_rgyib")
 
 [node name="WallGrab" type="Node" parent="States/Wall" unique_id=1539065211]
 script = ExtResource("7_boad6")
-
-[node name="WallClimb" type="Node" parent="States/Wall" unique_id=1269973034]
-script = ExtResource("8_8t03j")
 
 [node name="WallJump" type="Node" parent="States/Wall" unique_id=1563917170]
 script = ExtResource("8_hg6s5")

@@ -31,6 +31,10 @@ const default_jump_height: float = 100.0
 var jump_height_modifiers: Array[float] = [DEFAULT_JUMP_HEIGHT_MULTIPLIER]
 # 跳跃截取系数 
 @export var jump_cut_multiplier: float = 0.6
+# 跳跃状态
+enum JumpType { GROUND, COYOTE, AIR, BUFFER, WALL }
+var current_jump_type
+
 #endregion
 
 #region /// air movement
@@ -85,7 +89,6 @@ var ground_friction_multiplier: float = 1.0
 
 enum FacingDir { LEFT, RIGHT }
 var facing: FacingDir
-var last_facing: FacingDir
 
 var _missing_anim_warned: Dictionary = {}
 
@@ -96,7 +99,7 @@ var _missing_anim_warned: Dictionary = {}
 var can_wall_climb: bool = true
 
 var MAX_JUMP_VEL: float
-var current_jump_type: String = ""
+
 
 func  _ready() -> void:
 	# 初始化 states
@@ -123,6 +126,12 @@ func _process(_delta: float) -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	# 执行状态机逻辑
+	if current_state:
+		var next_state = current_state.physics_process(_delta)
+		if next_state != null:
+			change_state(next_state)
+	
 	# 重力
 	if gravity_enabled:
 		velocity.y += gravity * _delta
@@ -136,12 +145,6 @@ func _physics_process(_delta: float) -> void:
 	if input_dir != 0.0:
 		set_facing(FacingDir.RIGHT if input_dir > 0 else FacingDir.LEFT)
 		
-	# 执行状态机逻辑
-	if current_state:
-		var next_state = current_state.physics_process(_delta)
-		if next_state != null:
-			change_state(next_state)
-	
 	# 落地重置资源（仅在 velocity.y >= 0 时归零，避免清除跳跃速度）
 	if is_on_floor() and velocity.y >= 0:
 		velocity.y = 0
@@ -251,12 +254,11 @@ func reset_remaining_air_jump() -> int:
 
 func initialize_facing() -> void:
 	facing = FacingDir.RIGHT
-	last_facing = facing
 	
 	
 #region /// 动画方法
 
-func _hendle_anim(anim_name: String) -> bool:
+func _handle_anim(anim_name: String) -> bool:
 	if player_anim.sprite_frames.has_animation(anim_name):
 		# 动画存在，正常播放（避免重复播放同一个动画）
 		if player_anim.animation != anim_name:
@@ -283,20 +285,17 @@ func _hendle_anim(anim_name: String) -> bool:
 	
 # 时间驱动地面动画
 func play_anim(anim_base: String) -> void:
-	var suffix = "_right" if last_facing == FacingDir.RIGHT else "_left"
+	var suffix = "_right" if facing == FacingDir.RIGHT else "_left"
 	var anim_name = anim_base + suffix
-	_hendle_anim(anim_name)
+	_handle_anim(anim_name)
 
 # 物理驱动空中动画
 func update_air_animation() -> void:
-	var suffix: String = "_right" if last_facing == FacingDir.RIGHT else "_left"
+	var suffix: String = "_right" if facing == FacingDir.RIGHT else "_left"
 	var anim_name: String = ("airborne") + suffix
 	
-	if not _hendle_anim(anim_name):
+	if not _handle_anim(anim_name):
 		return
-		
-	if player_anim.animation != anim_name:
-		player_anim.play(anim_name)
 		
 	var max_vel = sqrt(2.0 * gravity * _get_effective_jump_height())
 	if max_vel <= 0.0:
@@ -320,7 +319,7 @@ func _push_debug_data() -> void:
 	DebugManager.set_value("player_vel_y", velocity.y)
 	DebugManager.set_value("is_on_floor", is_on_floor())
 	DebugManager.set_value("facing", facing)
-	DebugManager.set_value("last_facing", last_facing)
+	DebugManager.set_value("facing", facing)
 	DebugManager.set_value("now_pressed", _get_key_input())
 	DebugManager.set_value("can_coyote_jump", can_coyote_jump)
 	DebugManager.set_value("remaining_air_jump", remaining_air_jumps)
@@ -340,7 +339,6 @@ func _get_key_input() -> String:
 func set_facing(dir: FacingDir) -> void:
 	if facing != dir:
 		facing = dir
-		last_facing = dir
 
 
 # 垂直移动

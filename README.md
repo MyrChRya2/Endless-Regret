@@ -1,5 +1,25 @@
-# galaxy
+# EndlessRegret
 
-Still in alpha testing
+2D 横版动作平台跳跃游戏。一个做错事之人的赎罪之路。
 
-Should I put the game over there?
+- 引擎：Godot 4.7
+- 分辨率：640×360 像素
+- 平台：Steam（计划免费/低价，CC0 开源）
+
+## 文档
+
+- [游戏设计文档 (GDD)](../docs/GDD.md)
+- [开发路线图](../docs/ROADMAP.md)
+- [任务看板（飞书多维表格）](https://my.feishu.cn/base/Z02obyUD8alC2ys0maJchwsMnwc)
+
+## 当前阶段
+
+**M1 — 移动系统垂直切片**
+
+聚焦墙面动作（墙滑 + 墙跳）的实现与手感调优。
+
+## 开发原则
+
+- 一次只推进一个里程碑
+- 动画与代码同步推进，不积压
+- 移动系统未完成前不启动战斗开发
