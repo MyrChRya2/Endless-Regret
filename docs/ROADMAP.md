@@ -46,31 +46,38 @@ Release
 #### 1.1 地面动作打磨
 - [x] 待机 idle
 - [x] 奔跑 run
-- [x] 跳跃 airborne
-- [x] 滑铲 slide
+- [x] 跳跃 airborne（含 coyote time / jump buffer / 多段跳 / 跳跃截断，均在 airborne.gd 实现）
+- [ ] 滑铲 slide ⚠️ **代码已完成（slide.gd）但未接入状态机**（场景无 Slide 节点、无任何 get_state("Slide") 引用）→ 需注册节点并接触发
 - [ ] 动作参数微调（加速度、摩擦、跳跃曲线）
-- [ ]  coyote time / jump buffer 等手感优化
+- [x] coyote time / jump buffer 等手感优化（已在 airborne.gd 实现，待手感验证）
 
 #### 1.2 墙面动作（核心层）
-- [ ] 墙滑 wall_slide — 确定下落速度、控制感
-- [ ] 墙跳 wall_jump — 确定跳跃角度、力度、输入缓冲
-- [ ] 墙面动作与地面动作的切换逻辑
+- [x] 墙滑 wall_grab — 下落速度 20，贴墙按住方向进入（airborne → Wall/WallGrab）
+- [x] 墙跳 wall_jump — 蹬墙水平速度 300，跳后回 Airborne
+- [x] 墙面动作与地面动作的切换逻辑（WallGrab ↔ WallJump / WallKickout / Airborne）
+- [ ] 手感验证与参数微调（墙滑速度、墙跳力度、计时器阈值）
 
 #### 1.3 墙面动作（扩展层，预留接口）
-- [x] wall_climb 原型
-- [x] wall_grab 原型
-- [x] wall_kickout 原型
+- [x] wall_climb 原型（含加速/减速两阶段 + 动画）
+- [x] wall_grab 原型（已提升为核心层，见 1.2）
+- [x] wall_kickout 原型（蹬墙离墙，水平速度 200）
+- [ ] 决策：是否启用 wall_climb（当前进入逻辑在 wall_grab.gd 中被注释、场景无节点）→ 启用需注册 WallClimb 节点
 - [ ] 整理为可插拔的扩展状态，默认不启用
 
 #### 1.4 移动动画同步
 - [x] idle 动画
 - [x] run/move 动画
-- [x] airborne 动画
-- [ ] wall_slide 动画
-- [ ] wall_jump 动画
-- [ ] 动画与代码同步调试
+- [x] airborne 动画（按垂直速度驱动帧）
+- [x] wall_grab 动画（wall_grab_left/right 已入 SpriteFrames）
+- [x] wall_climb 动画（wall_climb_left/right 已入 SpriteFrames，待状态启用后生效）
+- [x] wall_jump / wall_kickout 无专用动画，跳后回 airborne（可接受，暂不新增）
+- [ ] 动画与代码同步调试（逐动作实机验证）
 
 **M1 完成标准：** 在 playground 场景中，玩家可以流畅完成跑、跳、滑、墙滑、墙跳的连续操作，手感满意。
+**M1 剩余工作（按依赖排序）：**
+1. 接线 slide：注册 Slide 状态节点 + 定义触发输入（建议：奔跑中按下方向键）
+2. 决策并（可选）启用 wall_climb
+3. 手感参数微调 + 动画同步验证
 
 ---
 
@@ -172,10 +179,11 @@ Release
 
 | 优先级 | 事项 | 状态 |
 |--------|------|------|
-| P0 | 墙面核心动作（墙滑+墙跳） | 进行中 |
-| P1 | 移动手感微调（coyote time 等） | 待开始 |
-| P2 | 墙面扩展状态整理为可插拔 | 待开始 |
-| P3 | 相机导演系统 | M2 |
-| P4 | 战斗系统 | M3 |
+| P0 | 滑铲 slide 接线（注册节点 + 触发输入） | 待开始 |
+| P0 | 墙面核心动作手感验证（墙滑速度 / 墙跳力度） | 代码完成，待实机验证 |
+| P1 | 决策是否启用 wall_climb（扩展层） | 待决策 |
+| P1 | 动作参数微调 + 动画同步验证 | 待开始 |
+| P2 | 相机导演系统 | M2 |
+| P3 | 战斗系统 | M3 |
 
 > **原则：一次只聚焦一个里程碑，当前 M1 未完成前不启动 M2/M3 的实质开发。**
