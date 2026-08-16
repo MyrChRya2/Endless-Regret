@@ -291,7 +291,14 @@ func play_anim(anim_base: String) -> void:
 
 # 物理驱动空中动画
 func update_air_animation() -> void:
-	var suffix: String = "_right" if facing == FacingDir.RIGHT else "_left"
+	var suffix: String
+	if velocity.x > 0.0:
+		suffix = "_right"
+	elif velocity.x < 0.0:
+		suffix = "_left"
+	else:
+		suffix = "_right" if player_anim.animation.ends_with("_right") else "_left"
+		
 	var anim_name: String = ("airborne") + suffix
 	
 	if not _handle_anim(anim_name):
