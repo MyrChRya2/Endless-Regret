@@ -8,8 +8,6 @@ func enter() -> void:
 	player.is_falling_off_ledge = false
 	player.jump_buffer_timer = 0.0
 	
-	player.can_wall_climb = true
-	
 
 func physics_process(_delta: float) -> PlayerState:
 	# 空中水平移动
