@@ -14,3 +14,6 @@ Desktop.ini
 .auth-linkedin/
 .auth-wechat-channels/
 .cheat-secrets.json
+
+# 内容创作工作区（cheat-on-content 数据，另一会话管理，不纳入游戏项目版本控制）
+content/
