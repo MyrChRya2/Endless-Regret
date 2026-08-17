@@ -149,6 +149,7 @@
 
 ### 项目结构
 ```
+PROJECT_INDEX.md         # 项目管理文件索引
 Game_Build/              # Godot 工程（仓库子目录）
 ├── addons/              # 插件（debug_system）
 ├── assets/game/         # 游戏资源（角色、tileset）
