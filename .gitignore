@@ -7,3 +7,10 @@ Desktop.ini
 .vscode/
 .idea/
 *.code-workspace
+
+# cheat-on-content — 账号凭证保护（content/ 项目）
+.auth/
+.auth-xhs/
+.auth-linkedin/
+.auth-wechat-channels/
+.cheat-secrets.json
