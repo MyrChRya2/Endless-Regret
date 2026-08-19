@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://88u4xpxjow2q" path="res://assets/game/character/Player_idle.png" id="9_2ieo8"]
 [ext_resource type="Texture2D" uid="uid://dnshoyp7fv6k6" path="res://assets/game/character/Player_move.png" id="9_8t03j"]
 [ext_resource type="Script" uid="uid://bdx8n4yl40v2k" path="res://player/states/wall_kickout.gd" id="10_8t03j"]
+[ext_resource type="Script" path="res://player/states/ledge_slide.gd" id="11_ledge_slide"]
+[ext_resource type="Script" path="res://player/states/ledge_grab.gd" id="12_ledge_grab"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_65viv"]
 atlas = ExtResource("9_8t03j")
@@ -511,6 +513,26 @@ animations = [{
 "loop": 1,
 "name": &"wall_grab_right",
 "speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_slide_left",
+"speed": 10.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_slide_right",
+"speed": 10.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_grab_left",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_grab_right",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oul6g"]
@@ -547,6 +569,12 @@ script = ExtResource("8_hg6s5")
 
 [node name="WallKickout" type="Node" parent="States/Wall" unique_id=846157764]
 script = ExtResource("10_8t03j")
+
+[node name="LedgeSlide" type="Node" parent="States/Wall"]
+script = ExtResource("11_ledge_slide")
+
+[node name="LedgeGrab" type="Node" parent="States/Wall"]
+script = ExtResource("12_ledge_grab")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666999116]
 position = Vector2(0, -13.5)

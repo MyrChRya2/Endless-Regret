@@ -42,14 +42,20 @@ func physics_process(_delta: float) -> PlayerState:
 		# 重置预输入倒计时
 		player.jump_buffer_timer = player.jump_buffer_time
 		
-	# 贴墙检测（优先于其他切换）
-	if player.is_on_wall() and not player.is_on_floor() and player.velocity.y >= 0:
+	# 贴墙检测（按向墙 + 下落时，按几何接触分类分发）
+	# wall_escape（脱离墙锁）：正在自由落体脱离墙面，跳过贴墙检测
+	if not player.wall_escape and player.is_on_wall() and not player.is_on_floor() and player.velocity.y >= 0:
 		var move_dir = Input.get_axis("move_left", "move_right")
 		var wall_normal = player.get_wall_normal()
 		if wall_normal != Vector2.ZERO:
 			var wall_dir = -sign(wall_normal.x)
 			if sign(move_dir) == wall_dir:
-				return player.get_state("Wall/WallGrab")
+				var contact = player.classify_wall_contact()
+				if contact == player.WallContact.FULL:
+					return player.get_state("Wall/WallGrab")
+				# LEDGE_TOP 和 SLIDING 都先进 LedgeSlide 滑落，
+				# 由 LedgeSlide 的挂边门槛决定何时挂边（防止触墙瞬间直接挂边）
+				return player.get_state("Wall/LedgeSlide")
 				
 	# 落地检测
 	if player.is_on_floor() and player.velocity.y >= 0:
