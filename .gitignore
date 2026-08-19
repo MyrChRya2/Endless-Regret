@@ -17,3 +17,6 @@ Desktop.ini
 
 # 内容创作工作区（cheat-on-content 数据，另一会话管理，不纳入游戏项目版本控制）
 content/
+
+# meow-memory 跨会话记忆数据（AI 记忆库，不纳入版本控制）
+.dsh-meow/
