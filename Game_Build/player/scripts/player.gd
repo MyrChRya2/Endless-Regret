@@ -70,6 +70,10 @@ var gravity: float = GRAVITATIONAL_ACCELERATION * NORMAL_GRAVITY_RATE
 var gravity_enabled: bool = true
 # 脱离墙锁：置位后 airborne 跳过贴墙检测（玩家从 WallGrab 脚底离墙后自由落体，不被拉回）
 var wall_escape: bool = false
+# 脱离锁剩余时间：锁在"完全离开墙面"或超时后自动复位。
+# 修复 B1-②：旧实现只在落地/跳跃时复位，脱墙后整段下落都跳过贴墙检测，再贴墙不回 WallGrab。
+var wall_escape_time: float = 0.0
+const WALL_ESCAPE_DURATION: float = 0.5
 #endregion
 
 #region /// friction
@@ -157,6 +161,7 @@ func _draw_ray(from_world: Vector2, to_world: Vector2, hit: bool) -> void:
 	
 
 # 检测一个世界坐标点是否在碰撞体内部（用微型圆形 intersect_shape）
+# 同时被生产逻辑使用：is_head_touching_ledge() 用它过滤"墙体内瓦片接缝"误判
 var _debug_point_shape := CircleShape2D.new()
 func _point_inside_world(point: Vector2) -> bool:
 	_debug_point_shape.radius = 0.5
@@ -279,6 +284,20 @@ func _physics_process(_delta: float) -> void:
 		reset_remaining_air_jump()
 		can_coyote_jump = true
 		wall_escape = false
+		wall_escape_time = 0.0
+	
+	# 脱离锁复位（B1-②）：完全离开墙面（is_on_wall=false）立即复位；仍贴墙则超时兜底复位。
+	# 目的：锁只在"脱墙过渡"期间生效（防贴墙检测把玩家瞬间拉回），
+	# 一旦玩家真的离开了墙面，后续再贴墙必须能重新进入 WallGrab。
+	if wall_escape:
+		if not is_on_wall():
+			wall_escape = false
+			wall_escape_time = 0.0
+		else:
+			wall_escape_time -= _delta
+			if wall_escape_time <= 0.0:
+				wall_escape = false
+				wall_escape_time = 0.0
 	
 func initialize_states() -> void:
 	_recursive_init(states_machine_container)
@@ -484,6 +503,7 @@ func _handle_jump() -> void:
 	var jump_vel := sqrt(2 * gravity * _get_effective_jump_height())
 	velocity.y = -jump_vel
 	wall_escape = false
+	wall_escape_time = 0.0
 	
 	
 # 水平移动
@@ -551,6 +571,9 @@ func get_ledge_dy() -> float:
 #   2. 法线判据：命中面接近水平朝上（normal.y < -0.9 = 真实墙顶）
 #      过滤 TileMapLayer 凹形凸分解的斜边（45° 等）——斜边高度可能恰好落在容差内，
 #      仅用高度判据会把玩家误挂到斜边上（墙角场景的挂边误判根源）
+#   3. 空间判据：命中面正上方必须是空的（真实墙顶）。过滤"墙体内瓦片接缝"误判（B1-①）：
+#      垂直射线偏移进墙体内部后，会命中相邻瓦片的接缝边界——接缝法线同样是 (0,-1) 的水平面，
+#      与真实墙顶无法区分，但接缝上方仍有瓦片（墙体延续），真实墙顶上方是空的。
 func is_head_touching_ledge() -> bool:
 	var hit := get_ledge_top_hit()
 	if hit.is_empty():
@@ -558,7 +581,12 @@ func is_head_touching_ledge() -> bool:
 	var dy := float(hit.position.y) - (global_position.y - 27.0)
 	if dy > 0.0 or dy < -LEDGE_TOLERANCE:
 		return false
-	return float(hit.normal.y) < -0.9
+	if float(hit.normal.y) >= -0.9:
+		return false
+	# 命中面上方 2px 处若埋在碰撞体里 → 是墙体内的接缝，不是墙顶
+	if _point_inside_world(Vector2(float(hit.position.x), float(hit.position.y) - 2.0)):
+		return false
+	return true
 
 
 # 沿墙面方向的水平射线，从玩家局部高度 local_y 处打出，返回是否命中

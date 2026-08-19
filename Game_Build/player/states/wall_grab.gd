@@ -36,9 +36,10 @@ func physics_process(_delta: float) -> PlayerState:
 		if contact == player.WallContact.LEDGE_TOP and _was_above:
 			return player.get_state("Wall/LedgeGrab")
 		# 脚底已离开墙面（只贴了上半身）→ 脱离墙面自由落体
-		# 置脱离锁：防止进 Airborne 后头顶还贴墙被贴墙检测拉回
+		# 置脱离锁：防止进 Airborne 后头顶还贴墙被贴墙检测拉回；锁会在离开墙面/超时后自动复位
 		if contact == player.WallContact.SLIDING:
 			player.wall_escape = true
+			player.wall_escape_time = player.WALL_ESCAPE_DURATION
 			return player.get_state("Airborne")
 			
 		if handle_hold_timer(_delta):
