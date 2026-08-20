@@ -20,3 +20,6 @@ content/
 
 # meow-memory 跨会话记忆数据（AI 记忆库，不纳入版本控制）
 .dsh-meow/
+
+# 游戏导出产物（Windows/Web 构建，不入库，发布走 GitHub Releases）
+exports/
