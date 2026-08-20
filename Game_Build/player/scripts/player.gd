@@ -111,57 +111,10 @@ func  _ready() -> void:
 	initialize_states()
 	initialize_facing()
 	pass
-#region /// 射线调试可视化
-
-@export var debug_draw_rays: bool = true
-
-func _draw() -> void:
-	if not debug_draw_rays:
-		return
-	var wall_normal := get_wall_normal()
-	if wall_normal == Vector2.ZERO:
-		return
-	var wall_dir: Vector2 = -sign(wall_normal.x) * Vector2.RIGHT
-		
-	# ① 头顶垂直射线（与实际判定一致：x 偏移到墙表面内侧 10px）
-	#    绿 = 有效挂边 / 黄 = 命中但高度或法线不符 / 红 = 未命中
-	var x_off: float = -sign(wall_normal.x) * 10.0
-	var v_from := global_position + Vector2(x_off, -41.0)
-	var v_to := global_position + Vector2(x_off, -13.0)
-	var v_hit := get_ledge_top_hit()
-	var v_color: Color
-	if v_hit.is_empty():
-		v_color = Color(1.0, 0.35, 0.35)
-	elif is_head_touching_ledge():
-		v_color = Color(0.0, 1.0, 0.0)
-	else:
-		v_color = Color(1.0, 1.0, 0.0)
-	draw_line(v_from - global_position, v_to - global_position, v_color, 1.5)
-	if not v_hit.is_empty():
-		draw_circle(Vector2(v_hit.position) - global_position, 3.0, v_color)
-		
-	# ② 头顶水平射线（头顶附近朝墙 20px）：青 = 命中 / 橙 = 未命中
-	var h_color := Color(0.0, 0.8, 1.0) if _wall_ray_hit(-25.0, 20.0) else Color(1.0, 0.5, 0.0)
-	draw_line(
-		Vector2(0.0, -25.0),
-		Vector2(0.0, -25.0) + wall_dir * 20.0,
-		h_color, 1.5)
-		
-	# ③ 脚底水平射线（脚底附近朝墙 20px）：青 = 命中 / 橙 = 未命中
-	var f_color := Color(0.0, 0.8, 1.0) if is_feet_touching_wall() else Color(1.0, 0.5, 0.0)
-	draw_line(
-		Vector2(0.0, -2.0),
-		Vector2(0.0, -2.0) + wall_dir * 20.0,
-		f_color, 1.5)
-		
-		
-func _draw_ray(from_world: Vector2, to_world: Vector2, hit: bool) -> void:
-	var color := Color(0.0, 1.0, 0.0) if hit else Color(1.0, 0.35, 0.35)
-	draw_line(from_world - global_position, to_world - global_position, color, 1.5)
-	
+#region /// 空间点检测
 
 # 检测一个世界坐标点是否在碰撞体内部（用微型圆形 intersect_shape）
-# 同时被生产逻辑使用：is_head_touching_ledge() 用它过滤"墙体内瓦片接缝"误判
+# 生产逻辑使用：is_head_touching_ledge() 用它过滤"墙体内瓦片接缝"误判
 var _debug_point_shape := CircleShape2D.new()
 func _point_inside_world(point: Vector2) -> bool:
 	_debug_point_shape.radius = 0.5
@@ -252,9 +205,6 @@ func _process(_delta: float) -> void:
 			change_state(next_state)
 		
 	_push_debug_data()
-	
-	if debug_draw_rays:
-		queue_redraw()
 	pass
 
 
