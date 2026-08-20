@@ -153,7 +153,7 @@ PROJECT_INDEX.md         # 项目管理文件索引
 Game_Build/              # Godot 工程（仓库子目录）
 ├── addons/              # 插件（debug_system）
 ├── assets/game/         # 游戏资源（角色、tileset）
-├── dev_tools/           # 开发工具（AI 助手）
+├── tools/               # 回归测试套件（headless：dump_tiles/test_b1/test_b2/test_head/test_climb）
 ├── player/              # 玩家相关
 │   ├── scripts/         # 核心脚本
 │   ├── states/          # 状态机状态

@@ -1,6 +1,6 @@
 # 📁 EndlessRegret 项目管理文件索引
 
-> 整理日期：2026-08-16 | 适用仓库版本：`main @ 7c63d4c`
+> 整理日期：2026-08-16 | 适用仓库版本：`main @ 2c24849`
 > 本文件列出项目中与项目管理相关的全部文件及其作用，方便快速定位。
 
 ## 一、核心管理文档（`docs/`，已纳入 Git 版本控制）
@@ -55,7 +55,8 @@ EndlessRegret/                  # 项目根（Git 仓库根）
 │   ├── playground.tscn         # 测试主场景
 │   ├── addons/                 # 插件（debug_system）
 │   ├── assets/                 # 游戏资源
-│   └── player/                 # 玩家代码（scripts / states）
+│   ├── tools/                  # 回归测试套件（headless：dump_tiles / test_b1 / test_b2 / test_head / test_climb）
+│   ├── player/                 # 玩家代码（scripts / states）
 └── Source_Files/               # 美术源文件（Aseprite）
 ```
 
@@ -73,3 +74,4 @@ EndlessRegret/                  # 项目根（Git 仓库根）
 - 2026-08-16：创建本文件（索引首版）
 - 2026-08-17：新增工作流规则 5（路径变更同步更新）、规则 6（周期性任务 R1）；GDD 结构树同步登记本文件；新增规则 4"每日收尾"（TEMPLATE.md 流程）、devlog 模板入索引
 - 2026-08-19：登记 `docs/DEBUG_NOTES.md`（调试知识库）；ROADMAP 新增 Bug 跟踪表
+- 2026-08-21：登记 `Game_Build/tools/`（回归测试套件）；GDD 结构树修正 dev_tools/ → tools/（dev_tools 目录实际不存在，属文档过时条目）；适用仓库版本更新至 2c24849
