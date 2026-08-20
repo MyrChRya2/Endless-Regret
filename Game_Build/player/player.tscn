@@ -10,9 +10,9 @@
 [ext_resource type="Texture2D" uid="uid://88u4xpxjow2q" path="res://assets/game/character/Player_idle.png" id="9_2ieo8"]
 [ext_resource type="Texture2D" uid="uid://dnshoyp7fv6k6" path="res://assets/game/character/Player_move.png" id="9_8t03j"]
 [ext_resource type="Script" uid="uid://bdx8n4yl40v2k" path="res://player/states/wall_kickout.gd" id="10_8t03j"]
-[ext_resource type="Script" path="res://player/states/ledge_slide.gd" id="11_ledge_slide"]
-[ext_resource type="Script" path="res://player/states/ledge_grab.gd" id="12_ledge_grab"]
-[ext_resource type="Script" path="res://player/states/ledge_climb.gd" id="13_ledge_climb"]
+[ext_resource type="Script" uid="uid://d0ndk7sg1s0ua" path="res://player/states/ledge_slide.gd" id="11_ledge_slide"]
+[ext_resource type="Script" uid="uid://5m1k3dh0kevc" path="res://player/states/ledge_grab.gd" id="12_ledge_grab"]
+[ext_resource type="Script" uid="uid://iek4wa2sah76" path="res://player/states/ledge_climb.gd" id="13_ledge_climb"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_65viv"]
 atlas = ExtResource("9_8t03j")
@@ -189,6 +189,10 @@ region = Rect2(192, 64, 32, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_art4l"]
 atlas = ExtResource("9_8t03j")
 region = Rect2(224, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_do7qw"]
+atlas = ExtResource("3_2ieo8")
+region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_j55il"]
 atlas = ExtResource("9_8t03j")
@@ -373,6 +377,36 @@ animations = [{
 "name": &"idle_right",
 "speed": 5.0
 }, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_climb_left",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_climb_right",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_grab_left",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_grab_right",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_slide_left",
+"speed": 10.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_slide_right",
+"speed": 10.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_35wys")
@@ -400,7 +434,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"run_left",
-"speed": 15.0
+"speed": 20.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -429,7 +463,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"run_right",
-"speed": 15.0
+"speed": 20.0
 }, {
 "frames": [],
 "loop": 0,
@@ -440,6 +474,14 @@ animations = [{
 "loop": 0,
 "name": &"slide_right",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_do7qw")
+}],
+"loop": 1,
+"name": &"sprite_target",
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -514,36 +556,6 @@ animations = [{
 "loop": 1,
 "name": &"wall_grab_right",
 "speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"ledge_slide_left",
-"speed": 10.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"ledge_slide_right",
-"speed": 10.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"ledge_grab_left",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"ledge_grab_right",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"ledge_climb_left",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"ledge_climb_right",
-"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oul6g"]
@@ -556,7 +568,7 @@ script = ExtResource("1_oul6g")
 unique_name_in_owner = true
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_wodsf")
-animation = &"wall_grab_right"
+animation = &"sprite_target"
 autoplay = "idle_right"
 
 [node name="States" type="Node" parent="." unique_id=1340329346]
@@ -581,13 +593,13 @@ script = ExtResource("8_hg6s5")
 [node name="WallKickout" type="Node" parent="States/Wall" unique_id=846157764]
 script = ExtResource("10_8t03j")
 
-[node name="LedgeSlide" type="Node" parent="States/Wall"]
+[node name="LedgeSlide" type="Node" parent="States/Wall" unique_id=193254763]
 script = ExtResource("11_ledge_slide")
 
-[node name="LedgeGrab" type="Node" parent="States/Wall"]
+[node name="LedgeGrab" type="Node" parent="States/Wall" unique_id=448637962]
 script = ExtResource("12_ledge_grab")
 
-[node name="LedgeClimb" type="Node" parent="States/Wall"]
+[node name="LedgeClimb" type="Node" parent="States/Wall" unique_id=1617821212]
 script = ExtResource("13_ledge_climb")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666999116]

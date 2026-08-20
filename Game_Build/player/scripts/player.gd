@@ -363,22 +363,28 @@ func _handle_anim(anim_name: String) -> bool:
 		if player_anim.animation != anim_name:
 			player_anim.play(anim_name)
 		return true
-	else:
-		# 动画缺失或为空帧占位（如 ledge_* / slide）：输出错误，并尝试播放 error 占位动画
-		if not _missing_anim_warned.has(anim_name):
-			_missing_anim_warned[anim_name] = true
-			push_error("动画 '", anim_name, "' 不存在或为空帧占位，使用 error 占位动画")
-			
-		if player_anim.sprite_frames.has_animation("error"):
-			if player_anim.animation != "error":
-				player_anim.play("error")
-		else:
-			# 连 error 动画都没有，则停止动画并显示第一帧（或保持当前帧）
-			player_anim.stop()
-			
+	# 空帧占位（动画名已注册但无帧，如 ledge_* / slide）→ 播放 sprite_target 标记精灵中心锚点（不报错）
+	if player_anim.sprite_frames.has_animation(anim_name):
+		_play_fallback("sprite_target")
+		DebugManager.set_value("current_anim", anim_name)
+		return false
+	# 动画名不存在 → 播放 error 并输出一次性报错（保持原行为）
+	if not _missing_anim_warned.has(anim_name):
+		_missing_anim_warned[anim_name] = true
+		push_error("动画 '", anim_name, "' 不存在，使用 error 占位动画")
+	_play_fallback("error")
 	DebugManager.set_value("current_anim", anim_name)
-	
 	return false
+
+
+# 播放兜底动画（error / sprite_target）；若兜底动画本身缺失或空帧，则停止动画显示第一帧
+func _play_fallback(fallback_name: String) -> void:
+	if player_anim.sprite_frames.has_animation(fallback_name) \
+			and player_anim.sprite_frames.get_frame_count(fallback_name) > 0:
+		if player_anim.animation != fallback_name:
+			player_anim.play(fallback_name)
+	else:
+		player_anim.stop()
 	
 	
 	
