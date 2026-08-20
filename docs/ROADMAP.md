@@ -81,11 +81,12 @@ Release
 
 #### 1.6 平台边缘挂边状态机（进行中）
 - [x] 边缘检测 v1（射线方案：三射线分类 WallContact，2026-08-17）⚠️ **效果差，待重构**（分析见 devlog 2026-08-17-c）
-- [x] 挂边状态 `ledge_grab`（悬挂、吸附、上扒含头顶空间检测）v1 已实现
+- [x] 挂边状态 `ledge_grab`（悬挂、吸附）v1 已实现
 - [x] 滑落过渡状态 `ledge_slide` v1 已实现
+- [x] 上爬状态 `ledge_climb`（2026-08-20 从 LedgeGrab 解耦；jump/move_up 进入；含头顶空间检测）v1 已实现
 - [x] 与 Airborne / Wall 系列的状态切换（按 WallContact 分类分发）v1 已实现
 - [ ] 重构挂边判定（**倾向方案 A：Area2D 传感器**，2026-08-17 本人倾向，待实施验证；备选 B/C 见 devlog 2026-08-17-c）
-- [ ] 挂边动画（ledge_grab/ledge_slide 动画占位已建，帧待 Aseprite）
+- [ ] 挂边动画（ledge_grab/ledge_slide/ledge_climb 动画占位已建，帧待 Aseprite）
 
 **M1 完成标准：** 在 playground 场景中，玩家可以流畅完成跑、跳、墙滑、墙跳、边缘挂边的连续操作，手感满意。
 **M1 剩余工作（按依赖排序）：**
@@ -255,4 +256,5 @@ Release
 > - 2026-08-17 — 新增周期性任务 R1：每周开发日志自媒体视频。
 > - 2026-08-19 — 挂边系统重构完成（高度+法线双判据）；建立 Bug 跟踪表（B1 重点、B2 搁置、B3 优化前）。
 > - 2026-08-20 — B1 修复：挂边判定增加"接缝空间判据"（过滤墙体内瓦片接缝误判）+ wall_escape 脱离锁自动复位；建立 tools/ headless 回归测试套件。
+> - 2026-08-20 — LedgeClimb 上爬状态：从 LedgeGrab 解耦（jump/move_up 进入，替代原 jump→WallJump）；顺带修复原上爬"只改 y 不改 x 爬上去悬空掉落"的问题。
 > 详见 `docs/devlog/`。

@@ -60,7 +60,7 @@
 | 跳跃 | `airborne` | ✅ 已完成（含 coyote time / jump buffer / 多段跳 / 跳跃截断） |
 | 墙滑 | `wall_grab` | ✅ 已实现（墙滑下落速度 20；仅下落中 + 按向墙面进入） |
 | 墙跳 | `wall_jump` | ✅ 已实现（蹬墙水平速度 300；空中贴墙按跳优先于土狼跳） |
-| 边缘挂边 | `ledge_hang` | 🔄 计划中（见 ROADMAP 1.6） |
+| 边缘挂边 | `ledge_grab` / `ledge_slide` / `ledge_climb` | ✅ 已实现（挂边/滑落/上爬，见 ROADMAP 1.6；动画占位） |
 
 #### 第二层：可选扩展（预留接口，按需启用）
 | 动作 | 状态 | 完成度 | 备注 |
@@ -72,7 +72,7 @@
 | 二段跳 | [待定] | ⚠️ 已实现 | `extra_air_jumps` 默认 1，视关卡设计需要决定是否保留 |
 | 抓钩/摆荡 | [待定] | ❌ 未开始 | 奥日风格，远期 |
 
-> **架构原则**：所有移动状态继承自 `00_player_state.gd` 基类，通过状态机切换。新增动作只需新建状态文件并注册，无需改动核心逻辑。核心层：idle / run / airborne / wall_grab / wall_jump / wall_kickout（+ 计划中 ledge_hang）。
+> **架构原则**：所有移动状态继承自 `00_player_state.gd` 基类，通过状态机切换。新增动作只需新建状态文件并注册，无需改动核心逻辑。核心层：idle / run / airborne / wall_grab / wall_jump / wall_kickout / ledge_grab / ledge_slide / ledge_climb。
 
 ### 动作衔接动画（后续阶段）
 所有动作之间添加**过渡动画**（如起跑、落地、起身），避免生硬切换。在移动动作全部定稿后统一制作。

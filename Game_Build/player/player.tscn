@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://bdx8n4yl40v2k" path="res://player/states/wall_kickout.gd" id="10_8t03j"]
 [ext_resource type="Script" path="res://player/states/ledge_slide.gd" id="11_ledge_slide"]
 [ext_resource type="Script" path="res://player/states/ledge_grab.gd" id="12_ledge_grab"]
+[ext_resource type="Script" path="res://player/states/ledge_climb.gd" id="13_ledge_climb"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_65viv"]
 atlas = ExtResource("9_8t03j")
@@ -533,6 +534,16 @@ animations = [{
 "loop": 1,
 "name": &"ledge_grab_right",
 "speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_climb_left",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"ledge_climb_right",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oul6g"]
@@ -575,6 +586,9 @@ script = ExtResource("11_ledge_slide")
 
 [node name="LedgeGrab" type="Node" parent="States/Wall"]
 script = ExtResource("12_ledge_grab")
+
+[node name="LedgeClimb" type="Node" parent="States/Wall"]
+script = ExtResource("13_ledge_climb")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666999116]
 position = Vector2(0, -13.5)
