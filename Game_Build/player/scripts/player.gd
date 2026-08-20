@@ -407,16 +407,17 @@ func initialize_facing() -> void:
 #region /// 动画方法
 
 func _handle_anim(anim_name: String) -> bool:
-	if player_anim.sprite_frames.has_animation(anim_name):
-		# 动画存在，正常播放（避免重复播放同一个动画）
+	if player_anim.sprite_frames.has_animation(anim_name) \
+			and player_anim.sprite_frames.get_frame_count(anim_name) > 0:
+		# 动画存在且有帧，正常播放（避免重复播放同一个动画）
 		if player_anim.animation != anim_name:
 			player_anim.play(anim_name)
 		return true
 	else:
-		# 动画缺失：输出错误，并尝试播放 error 占位动画
+		# 动画缺失或为空帧占位（如 ledge_* / slide）：输出错误，并尝试播放 error 占位动画
 		if not _missing_anim_warned.has(anim_name):
 			_missing_anim_warned[anim_name] = true
-			push_error("动画 '", anim_name, "' 不存在，使用 error 占位动画")
+			push_error("动画 '", anim_name, "' 不存在或为空帧占位，使用 error 占位动画")
 			
 		if player_anim.sprite_frames.has_animation("error"):
 			if player_anim.animation != "error":
