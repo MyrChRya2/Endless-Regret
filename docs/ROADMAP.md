@@ -85,8 +85,9 @@ Release
 - [x] 滑落过渡状态 `ledge_slide` v1 已实现
 - [x] 上爬状态 `ledge_climb`（2026-08-20 从 LedgeGrab 解耦；jump/move_up 进入；含头顶空间检测）v1 已实现
 - [x] 与 Airborne / Wall 系列的状态切换（按 WallContact 分类分发）v1 已实现
-- [ ] 重构挂边判定（**倾向方案 A：Area2D 传感器**，2026-08-17 本人倾向，待实施验证；备选 B/C 见 devlog 2026-08-17-c）
-- [ ] 挂边动画（ledge_grab/ledge_slide/ledge_climb 动画占位已建，帧待 Aseprite）
+- [x] ~~重构挂边判定~~ → **已用"高度+法线+空间"三判据完成重构**（8-19 双判据 + 8-20 接缝空间判据，B1 修复 8058b3c，headless 套件验证 129→0）
+- [x] 上爬手感微调（CLIMB_DURATION 0.2s / 余量 20 / 终点经 Airborne 落定，70ace00）
+- [ ] 挂边动画（ledge_grab/ledge_slide/ledge_climb 动画占位已建，**下一步：Aseprite 绘制**，见 GDD 动画工作流）
 
 **M1 完成标准：** 在 playground 场景中，玩家可以流畅完成跑、跳、墙滑、墙跳、边缘挂边的连续操作，手感满意。
 **M1 剩余工作（按依赖排序）：**
