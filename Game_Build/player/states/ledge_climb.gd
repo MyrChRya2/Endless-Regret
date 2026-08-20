@@ -6,9 +6,9 @@ class_name LedgeClimb extends WallState
 # 过程式（非瞬移）：位置由每帧插值驱动，配合 ledge_climb 动画（占位空帧，帧确定后对齐时长）。
 
 # 爬升过程时长（秒）：占位值，待 ledge_climb 动画帧确定后对齐（或改为动画帧驱动）
-const CLIMB_DURATION: float = 0.35
+const CLIMB_DURATION: float = 0.2
 # 爬升终点：脚底距平台顶的余量（防穿透，进 Idle 后由重力落定贴合）
-const CLIMB_END_CLEARANCE: float = 10.0
+const CLIMB_END_CLEARANCE: float = 20
 
 var _started: bool = false
 var _elapsed: float = 0.0
@@ -41,7 +41,7 @@ func physics_process(_delta: float) -> PlayerState:
 	player.velocity = Vector2.ZERO
 	if t >= 1.0:
 		# 爬到终点 → 进 Idle（exit 恢复重力，当帧 move_and_slide 落定贴合平台顶）
-		return player.get_state("Idle")
+		return player.get_state("Airborne")
 	return null
 
 
