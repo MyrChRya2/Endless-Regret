@@ -12,21 +12,29 @@ func enter() -> void:
 func physics_process(_delta: float) -> PlayerState:
 	var wall_normal := player.get_wall_normal()
 	if wall_normal == Vector2.ZERO:
-		return player.get_state("Wall/LedgeGrab")
+		return _fallback()
 	# 爬上后的站位：向平台内侧平移 16px（碰撞盒宽），站上平台顶面
 	# （原 _climb_up 只改 y 不改 x，玩家挂在平台侧面时爬上去会悬空掉落）
 	var target_x: float = player.global_position.x - sign(wall_normal.x) * 16.0
 	var hit := player.get_ledge_top_hit()
 	if hit.is_empty():
-		return player.get_state("Wall/LedgeGrab")
+		return _fallback()
 	var top_y: float = float(hit.position.y)
 	# 头顶空间检测：平台顶上方（爬上后身体将占用的 27px）不能被遮挡，否则爬升穿模
 	if not _has_headroom(target_x, top_y):
-		return player.get_state("Wall/LedgeGrab")
+		return _fallback()
 	# 爬上：脚底放到平台顶上方 10px（防穿透余量）、水平移到平台上，由当帧 move_and_slide + 重力自然落定贴合
 	player.global_position = Vector2(target_x, top_y - 10.0)
 	player.velocity = Vector2.ZERO
 	return player.get_state("Idle")
+
+
+# 爬升失败回退：头顶仍贴着平台顶 → 退回 LedgeGrab 保持挂边；否则退回 LedgeSlide 继续滑落
+# （LedgeClimb 可从 LedgeGrab 或 LedgeSlide 进入，回退到来源场景）
+func _fallback() -> PlayerState:
+	if player.is_head_touching_ledge():
+		return player.get_state("Wall/LedgeGrab")
+	return player.get_state("Wall/LedgeSlide")
 
 
 # 空间检测：平台顶上方 6/14/22px × 碰撞盒宽度 3 列采样，任一点埋入碰撞体 → 无净空

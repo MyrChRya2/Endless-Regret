@@ -23,17 +23,20 @@ func physics_process(_delta: float) -> PlayerState:
 	if player.get_ledge_dy() > player.LEDGE_APPROACH_MIN:
 		_was_above = true
 	
-	# 滑落中贴墙跳（与 WallGrab 一致）
+	# 上爬：按 jump 进入 LedgeClimb（与 LedgeGrab 一致；空间不足/平台顶不在附近时由 LedgeClimb 退回本状态）
 	if Input.is_action_just_pressed("jump"):
-		return player.get_state("Wall/WallJump")
+		return player.get_state("Wall/LedgeClimb")
 		
 	var contact = player.classify_wall_contact()
 	# 挂边：头顶顶着墙顶，且玩家是从上方滑落下来的（_was_above）
 	if contact == player.WallContact.LEDGE_TOP and _was_above:
 		return player.get_state("Wall/LedgeGrab")
+	# 完整贴墙（头顶+脚底都贴墙）→ 切回 WallGrab 慢滑（如从平台边缘滑落到旁边完整墙上）
+	if contact == player.WallContact.FULL:
+		return player.get_state("Wall/WallGrab")
 	if contact == player.WallContact.NONE:
 		return player.get_state("Airborne")
-	# FULL / SLIDING：继续滑落
+	# SLIDING：继续滑落
 		
 	# 按离墙方向键 0.2s → 脱墙自由落体
 	if handle_away_timer(_delta):

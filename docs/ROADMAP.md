@@ -257,4 +257,5 @@ Release
 > - 2026-08-19 — 挂边系统重构完成（高度+法线双判据）；建立 Bug 跟踪表（B1 重点、B2 搁置、B3 优化前）。
 > - 2026-08-20 — B1 修复：挂边判定增加"接缝空间判据"（过滤墙体内瓦片接缝误判）+ wall_escape 脱离锁自动复位；建立 tools/ headless 回归测试套件。
 > - 2026-08-20 — LedgeClimb 上爬状态：从 LedgeGrab 解耦（jump/move_up 进入，替代原 jump→WallJump）；顺带修复原上爬"只改 y 不改 x 爬上去悬空掉落"的问题。
+> - 2026-08-20 — 挂边上爬入口调整：移除 LedgeGrab 的 move_up 入口（jump 独占上爬）；LedgeSlide 接触 FULL 切回 WallGrab；LedgeSlide 的 jump 改为进入 LedgeClimb（不再 WallJump）。
 > 详见 `docs/devlog/`。

@@ -14,9 +14,9 @@ func exit() -> void:
 
 
 func physics_process(_delta: float) -> PlayerState:
-	# 上爬：按 up 或 jump 进入 LedgeClimb 状态
-	# （空间不足时由 LedgeClimb 退回本状态保持挂边；jump 不再进入 WallJump 蹬墙跳）
-	if Input.is_action_just_pressed("move_up") or Input.is_action_just_pressed("jump"):
+	# 上爬：按 jump 进入 LedgeClimb（空间不足时退回本状态保持挂边）
+	# （不再有 move_up 上爬入口；jump 不再进入 WallJump 蹬墙跳）
+	if Input.is_action_just_pressed("jump"):
 		return player.get_state("Wall/LedgeClimb")
 		
 	# 主动踢墙（与 WallGrab 一致）
