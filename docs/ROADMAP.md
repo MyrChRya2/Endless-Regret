@@ -87,7 +87,9 @@ Release
 - [x] 与 Airborne / Wall 系列的状态切换（按 WallContact 分类分发）v1 已实现
 - [x] ~~重构挂边判定~~ → **已用"高度+法线+空间"三判据完成重构**（8-19 双判据 + 8-20 接缝空间判据，B1 修复 8058b3c，headless 套件验证 129→0）
 - [x] 上爬手感微调（CLIMB_DURATION 0.2s / 余量 20 / 终点经 Airborne 落定，70ace00）
-- [ ] 挂边动画（ledge_grab/ledge_slide/ledge_climb 动画占位已建，**下一步：Aseprite 绘制**，见 GDD 动画工作流）
+- [x] 上爬两阶段演进（2026-08-21：CLIMB_SPEED 两阶段爬升——先垂直后水平，方向继承 + _handle_h_move 曲线起步；动画物理驱动：爬升进度映射动画帧，CLIMB_VERT/HORIZ_FRAMES 分段可配置，c92a5e2）
+- [x] WallGrab 落地分支改看输入（2026-08-21 用户确认保留：按移动键→Run 否则 Idle，4c76f2c）
+- [ ] 挂边动画（ledge_grab/ledge_slide/ledge_climb 动画占位已建，**下一步：Aseprite 绘制**，见 GDD 动画工作流；ledge_climb_right 骨架/6 帧已画，待融合 Godot——锚点跟踪方案待研究）
 
 **M1 完成标准：** 在 playground 场景中，玩家可以流畅完成跑、跳、墙滑、墙跳、边缘挂边的连续操作，手感满意。
 **M1 剩余工作（按依赖排序）：**
@@ -260,4 +262,6 @@ Release
 > - 2026-08-20 — B1 修复：挂边判定增加"接缝空间判据"（过滤墙体内瓦片接缝误判）+ wall_escape 脱离锁自动复位；建立 tools/ headless 回归测试套件。
 > - 2026-08-20 — LedgeClimb 上爬状态：从 LedgeGrab 解耦（jump/move_up 进入，替代原 jump→WallJump）；顺带修复原上爬"只改 y 不改 x 爬上去悬空掉落"的问题。
 > - 2026-08-20 — 挂边上爬入口调整：移除 LedgeGrab 的 move_up 入口（jump 独占上爬）；LedgeSlide 接触 FULL 切回 WallGrab；LedgeSlide 的 jump 改为进入 LedgeClimb（不再 WallJump）。
+> - 2026-08-21 — LedgeClimb 两阶段爬升：结束点贴瓦片上表面（删余量）、CLIMB_SPEED 先垂直后水平、方向继承 + 曲线起步、动画物理驱动（进度映射帧，分段可配置）——修复插值粘滞/对角被墙推回/全速瞬移问题。
+> - 2026-08-21 — WallGrab 落地分支改看输入（按移动键→Run 否则 Idle），用户确认保留。
 > 详见 `docs/devlog/`。
