@@ -427,7 +427,7 @@ func _push_debug_data() -> void:
 		return
 		
 	#DebugManager.set_value("player_vel", velocity.length())
-	#DebugManager.set_value("player_vel_x", velocity.x)
+	DebugManager.set_value("player_vel_x", velocity.x)
 	#DebugManager.set_value("player_vel_y", velocity.y)
 	#DebugManager.set_value("is_on_floor", is_on_floor())
 	#DebugManager.set_value("facing", facing)

@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://b2b4mqfliv2vc" path="res://player/states/idle.gd" id="2_g1dw6"]
 [ext_resource type="Texture2D" uid="uid://okks46m125gv" path="res://assets/game/character/error.png" id="3_2ieo8"]
 [ext_resource type="Script" uid="uid://oqpd00rfqmu5" path="res://player/states/run.gd" id="3_yw30f"]
+[ext_resource type="Texture2D" uid="uid://dek0cqenofx44" path="res://assets/game/character/LedgeClimb-test.png" id="5_kb6p2"]
 [ext_resource type="Script" uid="uid://4s4yy0y53jlq" path="res://player/states/wall_grab.gd" id="7_boad6"]
 [ext_resource type="Script" uid="uid://d2i13mnuej48o" path="res://player/states/wall_jump.gd" id="8_hg6s5"]
 [ext_resource type="Script" uid="uid://bomcvf3io767f" path="res://player/states/airborne.gd" id="8_rgyib"]
@@ -125,6 +126,30 @@ region = Rect2(32, 0, 16, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_c35mf"]
 atlas = ExtResource("9_2ieo8")
 region = Rect2(48, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2h6tc"]
+atlas = ExtResource("5_kb6p2")
+region = Rect2(0, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8rogd"]
+atlas = ExtResource("5_kb6p2")
+region = Rect2(32, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_48p26"]
+atlas = ExtResource("5_kb6p2")
+region = Rect2(64, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_anp34"]
+atlas = ExtResource("5_kb6p2")
+region = Rect2(96, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jdjat"]
+atlas = ExtResource("5_kb6p2")
+region = Rect2(128, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j420s"]
+atlas = ExtResource("5_kb6p2")
+region = Rect2(160, 0, 32, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_35wys"]
 atlas = ExtResource("9_8t03j")
@@ -382,7 +407,25 @@ animations = [{
 "name": &"ledge_climb_left",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2h6tc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8rogd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_48p26")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_anp34")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jdjat")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j420s")
+}],
 "loop": 1,
 "name": &"ledge_climb_right",
 "speed": 5.0
@@ -568,7 +611,7 @@ script = ExtResource("1_oul6g")
 unique_name_in_owner = true
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_wodsf")
-animation = &"sprite_target"
+animation = &"ledge_climb_right"
 autoplay = "idle_right"
 
 [node name="States" type="Node" parent="." unique_id=1340329346]

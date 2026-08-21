@@ -2,30 +2,40 @@ class_name LedgeClimb extends WallState
 
 # 上爬状态（过程式）：从 LedgeGrab / LedgeSlide 按 jump 进入。
 # 流程：初始化检测（平台顶在射线内 + 头顶净空）→ 失败立即回退（LedgeGrab 挂边 / LedgeSlide 滑落）；
-#       成功 → 在 CLIMB_DURATION 内把玩家位置线性插值到平台顶面上方 → 进 Idle（重力落定贴合）。
-# 过程式（非瞬移）：位置由每帧插值驱动，配合 ledge_climb 动画（占位空帧，帧确定后对齐时长）。
+#       成功 → 以 CLIMB_SPEED 两阶段爬升：先垂直上升到平台顶面，再水平平移站上台面 →
+#       落地后按输入进 Run / Idle。
+# 两阶段原因：对角插值在垂直段玩家盒还与墙体重叠，x 平移会被 move_and_slide 推回（x 卡住），
+# 垂直升过墙顶后 x 一次性补跳——表现为 x 瞬间变化。先升后移则两段都不撞墙，x 平滑。
+# 过程式（非瞬移）：位置由每帧速度驱动，配合 ledge_climb 动画（占位空帧，帧确定后对齐速度）。
 
-# 爬升过程时长（秒）：占位值，待 ledge_climb 动画帧确定后对齐（或改为动画帧驱动）
-const CLIMB_DURATION: float = 0.2
-# 爬升终点：脚底距平台顶的余量（防穿透，进 Idle 后由重力落定贴合）
-const CLIMB_END_CLEARANCE: float = 20
+# 上爬速度（px/s）：可配置；动画帧确定后对齐
+const CLIMB_SPEED: float = 150.0
+# 动画帧分配（可配置）：垂直上升段播放前 N 帧，水平平移段播放后 M 帧
+# （总和建议等于动画帧数；实际以动画帧数为准自适应截断）
+const CLIMB_VERT_FRAMES: int = 2
+const CLIMB_HORIZ_FRAMES: int = 4
 
 var _started: bool = false
-var _elapsed: float = 0.0
+var _arrived: bool = false
 var _from_pos: Vector2 = Vector2.ZERO
 var _to_pos: Vector2 = Vector2.ZERO
+var _total_dist: float = 0.0
+# 爬升期间跟踪的移动方向（-1/0/+1）：到达时继承该方向的速度（玩家爬升中按的方向 = 想跑的方向）
+var _climb_dir: float = 0.0
 
 
 func enter() -> void:
 	player.play_anim("ledge_climb")
-	player.gravity_enabled = false  # 爬升过程位置由插值驱动，不受重力
+	player.gravity_enabled = false  # 爬升过程位置由速度驱动，不受重力
 	player.velocity = Vector2.ZERO
 	_started = false
-	_elapsed = 0.0
+	_arrived = false
+	_climb_dir = 0.0
 
 
 func exit() -> void:
 	player.gravity_enabled = true
+	player.player_anim.speed_scale = 1.0  # 恢复自动播放（物理驱动期间置 0）
 
 
 func physics_process(_delta: float) -> PlayerState:
@@ -34,18 +44,41 @@ func physics_process(_delta: float) -> PlayerState:
 		_started = true
 		if not _setup():
 			return _fallback()
-	# 过程推进：线性插值 from → to
-	_elapsed += _delta
-	var t := clampf(_elapsed / CLIMB_DURATION, 0.0, 1.0)
-	player.global_position = _from_pos.lerp(_to_pos, t)
-	player.velocity = Vector2.ZERO
-	if t >= 1.0:
-		# 爬到终点 → 进 Idle（exit 恢复重力，当帧 move_and_slide 落定贴合平台顶）
-		return player.get_state("Airborne")
+	if not _arrived:
+		var step := CLIMB_SPEED * _delta
+		# 阶段1：垂直上升到平台顶面（y 向下为正，目标更小=更高）
+		if player.global_position.y > _to_pos.y:
+			player.global_position.y = maxf(player.global_position.y - step, _to_pos.y)
+		# 阶段2：水平平移站上台面（垂直到位后，盒底已贴平台顶，平移不撞墙）
+		else:
+			player.global_position.x = move_toward(player.global_position.x, _to_pos.x, step)
+		player.velocity = Vector2.ZERO
+		# 物理驱动动画：爬升进度（已走距离/总距离）→ 动画帧，动画正好持续整个爬升
+		_update_climb_anim()
+		# 跟踪移动方向：爬升期间按住的方向 = 到达后想跑的方向
+		var dir := Input.get_axis("move_left", "move_right")
+		if dir != 0.0:
+			_climb_dir = sign(dir)
+		if player.global_position.distance_to(_to_pos) < 0.5:
+			player.global_position = _to_pos
+			_arrived = true
+		return null
+	# 到达：位置已贴着平台顶面（_to_pos.y = top_y），交给当帧 move_and_slide 判定落地；
+	# 落地后按输入进 Run / Idle
+	player.gravity_enabled = true
+	if player.is_on_floor():
+		var move_dir := Input.get_axis("move_left", "move_right")
+		if move_dir != 0.0 or _climb_dir != 0.0:
+			# 以当前输入为准，否则用爬升期间跟踪的方向（继承移动意图）；
+			# 用统一加速度函数起步（_handle_h_move 曲线），进 Run 后继续加速到目标跑速
+			var dir := move_dir if move_dir != 0.0 else _climb_dir
+			player._handle_h_move(_delta, dir)
+			return player.get_state("Run")
+		return player.get_state("Idle")
 	return null
 
 
-# 初始化爬升路径：终点 = 平台顶面上方（x 向平台内侧移 16px = 碰撞盒宽，站上平台顶面）
+# 初始化爬升路径：终点 = 平台顶面上（x 向平台内侧移 16px = 碰撞盒宽，站上平台顶面）
 func _setup() -> bool:
 	var wall_normal := player.get_wall_normal()
 	if wall_normal == Vector2.ZERO:
@@ -59,8 +92,41 @@ func _setup() -> bool:
 	if not _has_headroom(target_x, top_y):
 		return false
 	_from_pos = player.global_position
-	_to_pos = Vector2(target_x, top_y - CLIMB_END_CLEARANCE)
+	_to_pos = Vector2(target_x, top_y)  # 结束位置：脚底贴着平台顶面（瓦片上表面）
+	_total_dist = _from_pos.distance_to(_to_pos)
 	return true
+
+
+# 物理驱动动画：垂直段播前 CLIMB_VERT_FRAMES 帧，水平段播后 CLIMB_HORIZ_FRAMES 帧
+# （两段各自按阶段进度映射帧）；speed_scale=0 停自动播放，帧由爬升位置决定
+func _update_climb_anim() -> void:
+	var anim := player.player_anim
+	anim.speed_scale = 0.0
+	var total: int = anim.sprite_frames.get_frame_count(anim.animation)
+	if total <= 0:
+		return
+	var v_count := mini(CLIMB_VERT_FRAMES, total)  # 垂直段帧数（自适应）
+	var frame := 0
+	if player.global_position.y > _to_pos.y:
+		# 垂直上升段：前 v_count 帧
+		var v_progress := 0.0
+		var v_range := _from_pos.y - _to_pos.y
+		if v_range > 0.001:
+			v_progress = clampf((_from_pos.y - player.global_position.y) / v_range, 0.0, 1.0)
+		frame = clampi(int(round(v_progress * float(v_count - 1))), 0, v_count - 1)
+	else:
+		# 水平平移段：后 total-v_count 帧
+		var h_start := v_count
+		var h_count := maxi(0, total - v_count)
+		if h_count > 0:
+			var h_progress := 0.0
+			var h_range := _from_pos.x - _to_pos.x
+			if absf(h_range) > 0.001:
+				h_progress = clampf((_from_pos.x - player.global_position.x) / h_range, 0.0, 1.0)
+			frame = clampi(h_start + int(round(h_progress * float(h_count - 1))), h_start, total - 1)
+		else:
+			frame = v_count - 1  # 无水平帧 → 停在垂直段末帧
+	anim.frame = frame
 
 
 # 爬升失败回退：头顶仍贴着平台顶 → 退回 LedgeGrab 保持挂边；否则退回 LedgeSlide 继续滑落
