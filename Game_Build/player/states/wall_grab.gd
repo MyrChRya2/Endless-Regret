@@ -15,10 +15,11 @@ func enter() -> void:
 		
 func physics_process(_delta: float) -> PlayerState:
 	if player.is_on_floor():
-		if abs(player.velocity.x) > 10.0:
+		# 落地：按下移动键 → 直接进 Run（墙滑期间 velocity.x 被锁定为 0，
+		# 原 |velocity.x|>10 判定恒不成立 → 贴墙滑到地面后只能站定，需看输入意图）
+		if Input.get_axis("move_left", "move_right") != 0.0:
 			return player.get_state("Run")
-		else:
-			return player.get_state("Idle")
+		return player.get_state("Idle")
 		
 	player.velocity.x = 0
 	
