@@ -12,7 +12,14 @@
 | `docs/devlog/2026-08-16.md` | **开发日志（首篇）** — 按日期记录每次开发会话：做了什么、决策与理由、踩坑、下一步。含日志规范说明。 |
 | `docs/devlog/TEMPLATE.md` | **开发日志模板** — 每日收尾生成日志的骨架与提问清单（见工作流规则 4）。 |
 | `docs/DEBUG_NOTES.md` | **调试知识库** — 射线判定等已验证的原理、陷阱与最佳实践（2026-08 挂边调试沉淀）。 |
+| `docs/story/` | **剧情产出目录** — 剧情 Agent 负责：世界观 / 大纲 / 角色 / 场景脚本。`_inbox/` 存用户原始构思存档（未定稿、非 canon）。详见 `ref_books/README.md` 的转换链路。 |
 | `docs/devlog/` | **开发日志目录** — 命名规则 `YYYY-MM-DD.md`（同一天多篇加 `-b`/`-c` 后缀）。 |
+
+## 一之二、剧情素材入口（项目根 `EndlessRegret/ref_books/`）
+
+| 路径 | 作用 |
+|------|------|
+| `ref_books/` | **剧情 Agent 的书籍素材入口**（非产出目录）— 上传书籍 → `book-to-skill` 转 `.dsh/skills/story-library/` → 供剧情会话按需加载。**第三方版权书籍不入 Git**（`.gitignore` 仅保留 README.md/.gitignore）。 |
 
 ## 二、仓库级管理配置（项目根 `EndlessRegret/`）
 
@@ -44,9 +51,11 @@ EndlessRegret/                  # 项目根（Git 仓库根）
 │   ├── GDD.md                  # 游戏设计文档
 │   ├── ROADMAP.md              # 开发路线图（含 Bug 跟踪表）
 │   ├── DEBUG_NOTES.md          # 调试知识库
+│   ├── story/                  # 剧情产出（剧情 Agent 负责，_inbox/ 存用户原始构思）
 │   └── devlog/                 # 开发日志
 │       ├── TEMPLATE.md         # 日志模板（每日收尾用）
 │       └── YYYY-MM-DD(-x).md   # 日志正文（如 2026-08-16.md / 2026-08-17-b.md）
+├── ref_books/                  # 剧情书籍素材入口（第三方版权书籍不入 Git）
 ├── Game_Build/                 # Godot 工程
 │   ├── .gitignore              # Git 忽略规则（工程级）
 │   ├── README.md               # 项目说明
@@ -75,3 +84,4 @@ EndlessRegret/                  # 项目根（Git 仓库根）
 - 2026-08-17：新增工作流规则 5（路径变更同步更新）、规则 6（周期性任务 R1）；GDD 结构树同步登记本文件；新增规则 4"每日收尾"（TEMPLATE.md 流程）、devlog 模板入索引
 - 2026-08-19：登记 `docs/DEBUG_NOTES.md`（调试知识库）；ROADMAP 新增 Bug 跟踪表
 - 2026-08-21：登记 `Game_Build/tools/`（回归测试套件）；GDD 结构树修正 dev_tools/ → tools/（dev_tools 目录实际不存在，属文档过时条目）；适用仓库版本更新至 2c24849
+- 2026-08-21：登记剧情 Agent 新增目录 `docs/story/`（剧情产出，_inbox/ 存用户原始构思）与 `ref_books/`（书籍素材入口，第三方版权书不入 Git）；GDD 核心主题标注 `[待定]`（赎罪之路 vs 赋予意义 并存为暂定假设）
