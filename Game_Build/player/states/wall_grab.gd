@@ -21,7 +21,11 @@ func physics_process(_delta: float) -> PlayerState:
 			return player.get_state("Run")
 		return player.get_state("Idle")
 		
-	player.velocity.x = 0
+	# 贴墙下滑：微小向墙速度保持贴紧（B4 修复——从 Airborne 贴墙进入时玩家可能停在
+	# 接触 margin（0.08px）边界，is_on_wall 在 true/false 间抖动 → WallGrab↔Airborne 乒乓；
+	# 向墙速度被墙面阻挡（无水平位移），但持续接触使 is_on_wall 稳定）
+	var wall_normal := player.get_wall_normal()
+	player.velocity.x = -sign(wall_normal.x) * 1.0 if wall_normal != Vector2.ZERO else 0.0
 	
 	player.velocity.y = min(player.velocity.y, slide_speed)
 	if player.is_on_wall():
