@@ -151,6 +151,14 @@ region = Rect2(128, 0, 32, 48)
 atlas = ExtResource("5_kb6p2")
 region = Rect2(160, 0, 32, 48)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_kcq4v"]
+atlas = ExtResource("9_8t03j")
+region = Rect2(288, 160, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qavcc"]
+atlas = ExtResource("9_8t03j")
+region = Rect2(128, 32, 32, 32)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_35wys"]
 atlas = ExtResource("9_8t03j")
 region = Rect2(0, 96, 32, 32)
@@ -435,7 +443,10 @@ animations = [{
 "name": &"ledge_grab_left",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kcq4v")
+}],
 "loop": 1,
 "name": &"ledge_grab_right",
 "speed": 5.0
@@ -445,7 +456,10 @@ animations = [{
 "name": &"ledge_slide_left",
 "speed": 10.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qavcc")
+}],
 "loop": 1,
 "name": &"ledge_slide_right",
 "speed": 10.0
@@ -611,7 +625,7 @@ script = ExtResource("1_oul6g")
 unique_name_in_owner = true
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_wodsf")
-animation = &"ledge_climb_right"
+animation = &"ledge_slide_right"
 autoplay = "idle_right"
 
 [node name="States" type="Node" parent="." unique_id=1340329346]
