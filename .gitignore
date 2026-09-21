@@ -24,5 +24,9 @@ content/
 # meow-memory 跨会话记忆数据（AI 记忆库，不纳入版本控制）
 .dsh-meow/
 
+# DSH 本地工作区：团队通讯信箱（.dsh/team/）与从藏书生成的资料库（.dsh/skills/）
+# 都是本机私有资产——信箱是协作琐碎记录，资料库派生自第三方版权书籍。
+.dsh/
+
 # 游戏导出产物（Windows/Web 构建，不入库，发布走 GitHub Releases）
 exports/
