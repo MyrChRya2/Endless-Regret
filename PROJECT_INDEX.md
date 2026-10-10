@@ -31,6 +31,7 @@
 | `.dsh/knowledge/` | **本机私有知识库根目录** — 存放供 AI 会话检索的离线资料库（不入 Git） |
 | `.dsh/knowledge/godot-docs/` | **Godot 官方开发文档全库** — 来源 `godotengine/godot-docs`，分支 **`4.7`**（对齐 `Game_Build/project.godot:15` 的引擎版本），commit **`9adca4c1c72917bfe1b7be3108abed5ce26696a6`**；**1479 个 `.rst`**（classes 1079 + tutorials 24 子目录），约 39 MB（正文 ~30.7 MB），MIT 许可（`LICENSE.txt` / `AUTHORS.md` 原样保留）。**检索须显式给 path**：`grep pattern="..." path=".dsh/knowledge/godot-docs/classes"`；更新用 `git -C .dsh/knowledge/godot-docs pull`（sparse 配置已存）。 |
 | `.dsh/knowledge/README.md` | **文档库索引** — 库元信息 + 「常见开发问题 → 文档路径」映射 17 条（CharacterBody2D / 物理射线 / TileMapLayer / 动画 / 输入 / 粒子 / 着色器 / 导出 / 性能 / 最佳实践等），含本次迁址记录 |
+| `.dsh/knowledge/Godot实战笔记.md` | **Godot 经验判据（Jam 反哺）** — FirstProject（Jam）记忆库 88 条 lesson 中筛出的**组 B 26 条 Godot 技术知识**，按主题归并为 10 节（Web 导出与本地预览 / 像素完美显示 / 渲染顺序与 Y 排序 / `TileMapLayer` 属性表 / 场景与资源组织 / 核实引擎事实 / 路径大小写与入口 uid / 音频 / 遮罩 shader 纹素对齐 / 字体许可读取）。**经验判据**，精确 API 以 `godot-docs/` 为准；新练手工作区可复制复用 |
 | `.dsh/team/` | **团队协作信箱** — 值班室简报、各角色 agent 消息与决策队列（`decisions.md`），本机私有 |
 
 ## 二、仓库级管理配置（项目根 `EndlessRegret/`）
@@ -103,3 +104,4 @@ EndlessRegret/                  # 项目根（Git 仓库根）
 - 2026-08-21：登记剧情 Agent 新增目录 `docs/story/`（剧情产出，_inbox/ 存用户原始构思）与 `ref_books/`（书籍素材入口，第三方版权书不入 Git）；GDD 核心主题标注 `[待定]`（赎罪之路 vs 赋予意义 并存为暂定假设）
 - 2026-09-21：新增工作流规则 7（开发工具更新归档，devlog 独立小节）；剧情线状态更正为「暂缓，等书库建成」（用户澄清 v0 大纲仅早期草稿）；游戏定位变更像素 ARPG
 - 2026-10-10：**项目状态变更为「暂时搁置」**（用户决定，见 devlog 2026-10-10），头部加搁置标注；新增「一之三、本机私有工作区（`.dsh/`，不入 Git）」章节，登记 `.dsh/knowledge/`（**Godot 官方文档全库新落点**，分支 4.7 / commit 9adca4c / 1479 个 `.rst`）与 `.dsh/knowledge/README.md`、`.dsh/team/`；目录树补 `.dsh/` 子树；适用仓库版本更新至 `a142c38`
+- 2026-10-10：登记 `.dsh/knowledge/Godot实战笔记.md`（Jam 反哺的组 B 26 条 Godot 经验判据）；devlog 2026-10-10「开发工具更新」同步
